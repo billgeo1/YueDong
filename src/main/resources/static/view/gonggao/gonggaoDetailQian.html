@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育系统公告详情，查看校园体育用品网的课程安排、活动通知与服务说明。">
+    <meta name="author" content="跃动体育">
+
+    <title>公告详情｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <a href="/view/gonggao/gonggaoAll.html">系统公告</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>公告详情</span>
+                </div>
+                <span class="sports-page-hero__kicker">Campus Noticeboard</span>
+                <h1>{{gonggao.biaoti || '系统公告'}}</h1>
+                <p>重要信息集中发布，训练与购物安排请以最新公告为准。</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="article-layout">
+                    <article class="article-card">
+                        <img v-if="gonggao.fujian"
+                             class="article-cover"
+                             :src="gonggao.fujian"
+                             @error="hideBrokenImage"
+                             :alt="gonggao.biaoti">
+                        <div class="article-body">
+                            <div class="article-meta">
+                                <span><i class="bi bi-calendar3"></i> {{gonggao.shijian || '发布时间待更新'}}</span>
+                                <span><i class="bi bi-megaphone"></i> 系统公告</span>
+                                <span><i class="bi bi-mortarboard"></i> 校园体育服务</span>
+                            </div>
+                            <div v-html="gonggao.neirong"></div>
+                            <div class="article-end">
+                                <span>KEEP MOVING · STAY READY</span>
+                                <a href="/view/gonggao/gonggaoAll.html"><i class="bi bi-arrow-left"></i> 返回公告列表</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <aside class="article-side">
+                        <div class="article-side__card">
+                            <h3>更多内容</h3>
+                            <a href="/view/gonggao/gonggaoAll.html">
+                                <span><i class="bi bi-megaphone me-2"></i>全部系统公告</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <a href="/view/xinwen/xinwenAll.html">
+                                <span><i class="bi bi-newspaper me-2"></i>运动资讯</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <a href="/view/liuyanban/liuyanbanAll.html">
+                                <span><i class="bi bi-chat-dots me-2"></i>运动社区</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="article-side__cta">
+                            <i class="bi bi-bag-check"></i>
+                            <h3>下一场训练，装备先到位</h3>
+                            <p>篮球、足球、网球、乒乓球与羽毛球装备，为大学生运动生活准备。</p>
+                            <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">
+                                去逛装备 <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            gonggao: {}
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/gonggaoDetailQian',
+                    params: {
+                        id: getUrlParam('id')
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.gonggao = data.data.data;
+                        if (this.gonggao.biaoti)
+                        {
+                            document.title = this.gonggao.biaoti + "｜跃动体育";
+                        }
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            hideBrokenImage(event)
+            {
+                event.target.style.display = "none";
+            },
+
+            down(url)
+            {
+                window.location.href = "/down?url=" + url;
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

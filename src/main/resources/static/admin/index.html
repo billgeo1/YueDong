@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>校园运动装备管理台 | 大学生体育用品网</title>
+    <link rel="stylesheet" href="../css/admin.css">
+    <link rel="stylesheet" href="../css/sports-console.css">
+    <script src="../js/admin.js"></script>
+
+    <script type="text/javascript">
+        function logout() {
+            if (confirm("确定要退出本系统吗??")) {
+                sessionStorage.removeItem("admin");
+                localStorage.removeItem("admin");
+                window.parent.location = "../index.html";
+            }
+        }
+    </script>
+</head>
+
+<body class="console-shell">
+    <div class="admin" id="adminShell">
+        <div class="top">
+            <div class="logo">
+                <a class="console-brand" href="right.html" target="rightiframe" aria-label="返回管理工作台">
+                    <span class="console-brand__mark">
+                        <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                            <circle cx="24" cy="24" r="17" stroke="#111827" stroke-width="2.6" />
+                            <path d="M7.5 24h33M24 6.8c-6 4.9-9 10.7-9 17.2s3 12.3 9 17.2M24 6.8c6 4.9 9 10.7 9 17.2s-3 12.3-9 17.2"
+                                stroke="#111827" stroke-width="2.2" stroke-linecap="round" />
+                            <path d="M27.8 11.8 18.6 25h6.6L20.2 36.4 31.8 21.8h-6.7z" fill="#ff6b3d"
+                                stroke="#111827" stroke-width="1.6" stroke-linejoin="round" />
+                        </svg>
+                    </span>
+                    <span class="console-brand__copy">
+                        <strong>大学生体育用品网</strong>
+                        <small>CAMPUS SPORTS MANAGER</small>
+                    </span>
+                </a>
+
+                <div class="console-top-meta">
+                    <span class="console-top-chip"><i></i>运动装备管理台</span>
+                    <span class="console-top-date">PLAY HARD · WORK SMART</span>
+                </div>
+            </div>
+
+            <div class="toolBtn">
+                <div class="console-user">
+                    <span class="console-user__avatar">管</span>
+                    <span class="console-user__copy">
+                        <small>MANAGER</small>
+                        <b>系统管理员</b>
+                    </span>
+                </div>
+
+                <span class="clear" id="clearCache">
+                    <em>清除缓存</em>
+                </span>
+                <span class="shutdown" onclick="logout()">
+                    <em>退出登录</em>
+                </span>
+                <button class="console-nav-toggle" id="navToggle" type="button" aria-label="展开菜单"
+                    aria-expanded="false">
+                    <span></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="body">
+            <div class="left">
+                <div class="console-side-head">
+                    <span>工作台导航</span>
+                    <small>MENU</small>
+                </div>
+
+                <ul class="navTools">
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t1 toolLink"><a href="/admin/userInfo/userPw.html"
+                                    target="rightiframe">修改密码</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a href="/admin/user/userMana.html"
+                                    target="rightiframe">用户信息管理</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLi"><span class="t3 toolLink">类别管理</span></div>
+                        <dl class="downmenu">
+                            <dd><a href="/admin/leibie/leibieMana.html" target="rightiframe">类别列表</a></dd>
+                            <dd><a href="/admin/leibie/leibieAdd.html" target="rightiframe">添加类别</a></dd>
+                        </dl>
+                    </li>
+
+                    <li>
+                        <div class="menuLi"><span class="t3 toolLink">商品信息管理</span></div>
+                        <dl class="downmenu">
+                            <dd><a href="/admin/product/productMana.html" target="rightiframe">商品列表</a></dd>
+                            <dd><a href="/admin/product/productAdd.html" target="rightiframe">添加商品</a></dd>
+                        </dl>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a href="/admin/order/orderMana.html"
+                                    target="rightiframe">订单管理</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLi"><span class="t2 toolLink">新闻动态管理</span></div>
+                        <dl class="downmenu">
+                            <dd><a href="/admin/xinwen/xinwenMana.html" target="rightiframe">新闻列表</a></dd>
+                            <dd><a href="/admin/xinwen/xinwenAdd.html" target="rightiframe">发布新闻</a></dd>
+                        </dl>
+                    </li>
+
+                    <li>
+                        <div class="menuLi"><span class="t3 toolLink">系统公告管理</span></div>
+                        <dl class="downmenu">
+                            <dd><a href="/admin/gonggao/gonggaoMana.html" target="rightiframe">系统公告列表</a></dd>
+                            <dd><a href="/admin/gonggao/gonggaoAdd.html" target="rightiframe">添加公告</a></dd>
+                        </dl>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a
+                                    href="/admin/liuyanban/liuyanbanMana.html" target="rightiframe">留言板管理</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a href="/admin/pingjia/pingjiaMana.html"
+                                    target="rightiframe">评价管理</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a href="/admin/duihuan/duihuanMana.html"
+                                    target="rightiframe">礼品兑换管理</a></span></div>
+                    </li>
+
+                    <li>
+                        <div class="menuLiT indexLink"><span class="t4 toolLink"><a href="/admin/product/xiaoliang.html"
+                                    target="rightiframe">销售统计</a></span></div>
+                    </li>
+                </ul>
+
+                <div class="console-side-note">
+                    <span class="console-side-note__ball"></span>
+                    <strong>装备上新提醒</strong>
+                    <p>及时维护商品库存与分类，让每一件运动装备都能准时上场。</p>
+                </div>
+            </div>
+
+            <div class="right">
+                <iframe src="right.html" frameborder="0" id="rightiframe" name="rightiframe"></iframe>
+            </div>
+        </div>
+
+        <div class="console-nav-backdrop" id="navBackdrop"></div>
+    </div>
+
+    <script>
+        var clearCache = document.getElementById('clearCache');
+        clearCache.onclick = function () {
+            tipAlert({
+                title: "缓存清除成功",
+                state: "true", //true成功 fail失败
+                time: 1 //3秒后关闭
+            });
+        }
+
+        $(function () {
+            $('.indexLink .toolLink').click(function () {
+                $('.navTools> li> .menuLi').removeClass('menuActive');
+                $('.downmenu>dd').removeClass('onLink');
+            })
+            $('.navTools> li> .menuLi').click(function () {
+                if (!$(this).hasClass('menuActive')) {
+                    $('.navTools> li> .menuLi').removeClass('menuActive');
+                    $(this).addClass('menuActive');
+                } else {
+                    $(this).removeClass('menuActive');
+                }
+            })
+
+            $('.downmenu>dd>a').click(function (event) {
+                event.stopPropagation();
+                $('.downmenu>dd').removeClass('onLink');
+                $(this).parent('dd').addClass('onLink');
+            });
+
+        })
+
+        ;(function () {
+            var shell = document.getElementById('adminShell');
+            var toggle = document.getElementById('navToggle');
+            var backdrop = document.getElementById('navBackdrop');
+
+            function closeNav() {
+                shell.classList.remove('nav-open');
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+
+            toggle.addEventListener('click', function () {
+                var opened = shell.classList.toggle('nav-open');
+                toggle.setAttribute('aria-expanded', opened ? 'true' : 'false');
+            });
+
+            backdrop.addEventListener('click', closeNav);
+            $('.navTools a').on('click', closeNav);
+        })();
+    </script>
+</body>
+
+</html>

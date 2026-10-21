@@ -1,0 +1,251 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="注册跃动体育账号，加入大学生体育用品网，收藏装备并参与校园运动社区。">
+    <meta name="author" content="跃动体育">
+
+    <title>注册｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="auth-section">
+            <div class="container">
+                <a href="/view/index.html" class="page-back">
+                    <i class="bi bi-arrow-left"></i> 返回首页
+                </a>
+
+                <div class="auth-card auth-card--register">
+                    <div class="auth-visual auth-visual--register">
+                        <span class="auth-visual__court" aria-hidden="true"></span>
+                        <span class="auth-visual__ball" aria-hidden="true"><i class="bi bi-dribbble"></i></span>
+                        <div class="auth-visual__brand">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            Join The Campus Team
+                        </div>
+                        <h2>你的校园运动<br>从这里开球</h2>
+                        <p>建立你的运动档案，收藏喜欢的装备，参与社区交流，让每一次训练都有迹可循。</p>
+                        <div class="auth-features">
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 独立装备收藏夹</div>
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 快速结算与订单管理</div>
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 校园运动资讯与交流</div>
+                        </div>
+                        <div class="auth-visual__meta">
+                            <span><strong>04</strong> 运动品类</span>
+                            <span><strong>24H</strong> 随时开练</span>
+                        </div>
+                    </div>
+
+                    <div class="auth-form-wrap">
+                        <span class="auth-form-wrap__kicker">Create Account / 新队员报到</span>
+                        <h1>注册跃动账号</h1>
+                        <p>填写基础信息，加入大学生体育用品网。</p>
+
+                        <form class="sports-form" name="formReg" method="post" @submit.prevent="userReg()">
+                            <div class="sports-form__grid">
+                                <div class="form-group">
+                                    <label for="reg-username">账号</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-person"></i>
+                                        <input id="reg-username" type="text" v-model="user.username" name="username"
+                                               autocomplete="username" placeholder="设置登录账号">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="reg-password">密码</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-shield-lock"></i>
+                                        <input id="reg-password" type="password" v-model="user.password" name="password"
+                                               autocomplete="new-password" placeholder="设置登录密码">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="reg-realname">姓名</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-person-badge"></i>
+                                        <input id="reg-realname" type="text" name="xingming" v-model="user.xingming"
+                                               autocomplete="name" placeholder="请输入真实姓名">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label>性别</label>
+                                    <div class="radio-group">
+                                        <label><input type="radio" name="xingbie" v-model="user.xingbie" value="男"> 男</label>
+                                        <label><input type="radio" name="xingbie" v-model="user.xingbie" value="女"> 女</label>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="reg-age">年龄</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-calendar3"></i>
+                                        <input id="reg-age" type="text" name="nianling" v-model="user.nianling"
+                                               inputmode="numeric" placeholder="请输入年龄"
+                                               onkeyup="value=value.replace(/[^\d]/g,'')"
+                                               onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="reg-phone">联系电话</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-telephone"></i>
+                                        <input id="reg-phone" type="text" name="dianhua" v-model="user.dianhua"
+                                               autocomplete="tel" placeholder="请输入联系电话">
+                                    </div>
+                                </div>
+
+                                <div class="form-group form-group--full">
+                                    <label for="reg-address">常用地址</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-geo-alt"></i>
+                                        <input id="reg-address" type="text" name="dizhi" v-model="user.dizhi"
+                                               autocomplete="street-address" placeholder="请输入宿舍或常用收货地址">
+                                    </div>
+                                </div>
+
+                                <div class="form-group form-group--full">
+                                    <label for="reg-email">邮箱</label>
+                                    <div class="input-wrap">
+                                        <i class="bi bi-envelope"></i>
+                                        <input id="reg-email" type="email" name="youxiang" v-model="user.youxiang"
+                                               autocomplete="email" placeholder="请输入常用邮箱">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="sports-form__error" v-if="formError" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> {{formError}}
+                            </div>
+
+                            <button type="submit" class="sports-form__submit" :disabled="isSubmitting">
+                                {{isSubmitting ? '正在创建账号...' : '完成注册，准备上场'}}
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <div class="auth-switch">
+                            已有账号？
+                            <a href="/view/user/userLogin.html">直接登录</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            user: {
+                uid: "",
+                username: "",
+                password: "",
+                xingming: "",
+                xingbie: "男",
+                nianling: "22",
+                dizhi: "",
+                dianhua: "",
+                youxiang: "",
+                fujian: "",
+                shijian: "",
+                del: "no"
+            },
+            formError: "",
+            isSubmitting: false
+        },
+
+        methods: {
+            getData()
+            {
+            },
+
+            userReg()
+            {
+                this.formError = "";
+
+                if (this.user.username == "")
+                {
+                    this.formError = "请输入账号";
+                    return;
+                }
+                if (this.user.password == "")
+                {
+                    this.formError = "请输入密码";
+                    return;
+                }
+                if (this.user.xingming == "")
+                {
+                    this.formError = "请输入姓名";
+                    return;
+                }
+
+                this.isSubmitting = true;
+                axios({
+                    method: 'POST',
+                    url: '/userReg',
+                    data: this.user,
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        alert("注册成功，请登录吧");
+                        location.href = "/view/user/userLogin.html";
+                    }
+                    if (data.data.state == 44)
+                    {
+                        this.formError = "该账号已被占用，请换一个账号";
+                    }
+                }).catch(error => {
+                    this.formError = "注册暂时不可用，请稍后再试";
+                }).finally(() => {
+                    this.isSubmitting = false;
+                })
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

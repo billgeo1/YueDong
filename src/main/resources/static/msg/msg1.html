@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<script type="text/javascript">
+function getUrlParam(name)
+{
+	var url = window.location.search;
+	var reg = new RegExp("(^|&amp;)"+ name +"=([^&amp;]*)(&amp;|$)");//接受传递中文处理好的
+	var result = url.substr(1).match(reg);
+	return result ? decodeURIComponent(result[2]) : null;
+
+}
+    
+
+
+function fuzhi()
+{
+	var msg = getUrlParam('msg');
+	document.getElementById("div1").innerHTML=msg;
+}
+
+
+
+
+</script>
+
+</head>
+<body style="margin: 15px;" onload="fuzhi()">
+     <div id="div1">
+     
+     </div>
+</body>
+</html>

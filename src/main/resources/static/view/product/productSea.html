@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="搜索大学生体育用品，发现篮球、足球、网球、乒乓球与羽毛球装备。">
+    <meta name="author" content="跃动体育">
+    <title>装备搜索｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero sports-page-hero--art search-hero">
+            <div class="sports-page-hero__art" aria-hidden="true">
+                <div class="search-hero__photo"></div>
+                <span class="sports-page-hero__line"></span>
+            </div>
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>装备搜索</span>
+                </div>
+                <span class="sports-page-hero__kicker">Gear Finder / 装备搜索</span>
+                <h1>找到你的下一件装备</h1>
+                <p>输入商品名称，快速找到适合训练、比赛和校园生活的运动装备。每一次搜索，都是下一次上场前的准备。</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <form class="search-panel" @submit.prevent="productRes()">
+                    <span class="search-panel__icon"><i class="bi bi-search"></i></span>
+                    <input type="text" v-model="title" name="title" placeholder="试试搜索「篮球」「羽毛球拍」「网球训练器」" autocomplete="off">
+                    <input type="button" value="搜索装备" @click="productRes()">
+                </form>
+
+                <div class="search-suggestions">
+                    <span>热门搜索</span>
+                    <a href="/view/product/productRes.html?title=篮球">篮球</a>
+                    <a href="/view/product/productRes.html?title=足球">足球</a>
+                    <a href="/view/product/productRes.html?title=球拍">球拍</a>
+                    <a href="/view/product/productRes.html?title=训练器">训练器</a>
+                </div>
+
+                <div class="search-intro-grid">
+                    <article class="search-intro-card">
+                        <i class="bi bi-dribbble"></i>
+                        <strong>球类装备</strong>
+                        <span>篮球、足球、乒乓球与羽毛球，覆盖不同校园运动场景。</span>
+                    </article>
+                    <article class="search-intro-card">
+                        <i class="bi bi-speedometer2"></i>
+                        <strong>训练辅助</strong>
+                        <span>从基础练习到专项提升，找到适合自己节奏的训练器材。</span>
+                    </article>
+                    <article class="search-intro-card">
+                        <i class="bi bi-people-fill"></i>
+                        <strong>校园赛场</strong>
+                        <span>为社团活动、体育课和校园联赛，准备更专业的运动装备。</span>
+                    </article>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            title: ""
+        },
+
+        methods: {
+            productRes() {
+                var keyword = this.title.trim();
+                if (!keyword) {
+                    alert("请输入要搜索的商品名称");
+                    return;
+                }
+                window.location.href = "/view/product/productRes.html?title=" + encodeURIComponent(keyword);
+            }
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

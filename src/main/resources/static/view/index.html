@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <meta name="description" content="跃动体育，大学生体育用品网。精选篮球、足球、网球、乒乓球、羽毛球装备，让每一次上场都更有底气。">
+        <meta name="author" content="跃动体育">
+
+        <title>跃动体育｜大学生体育用品网</title>
+
+        <link href="/css/bootstrap.min.css" rel="stylesheet">
+        <link href="/css/bootstrap-icons.css" rel="stylesheet">
+        <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+        
+        <style rel="stylesheet" type="text/css">
+			/* .c1-bline{border-bottom:#999 1px ;border-top:1px;} */
+			.c1-bline{border-bottom:#999 1px dashed;border-top:1px;}
+			.f-right{float:right}
+			.f-left{float:left}
+			.clear{clear:both}
+		</style>
+		
+		
+		<script src="/js/vue.min.js"></script>
+        <script src="/js/httpVueLoader.js"></script><!-- 引入 http-vue-loader -->   
+        <script type="text/javascript" src="/js/axios.min.js"></script>
+
+ </head>
+    
+<body>
+<div id="app">
+        <my-header></my-header>
+
+        <main>
+            <section class="sports-hero">
+                <div class="hero-motion" aria-hidden="true">
+                    <span class="hero-motion__ring"></span>
+                    <span class="hero-motion__ball"></span>
+                    <span class="hero-motion__trail"></span>
+                </div>
+                <div class="container">
+                    <div class="hero-grid">
+                        <div class="hero-content">
+                            <div class="hero-eyebrow"><span></span> Campus Sports / 2026</div>
+                            <h1 class="hero-title">为每一次<br><em>上场</em>而生</h1>
+                            <p class="hero-copy">从球场到操场，从日常训练到校园联赛，为大学生挑选专业、耐用、有个性的运动装备。装备到位，状态全开。</p>
+                            <div class="hero-tags">
+                                <a href="/view/product/productByLeibie.html?leibieId=26"># 篮球足球</a>
+                                <a href="/view/product/productByLeibie.html?leibieId=27"># 网球</a>
+                                <a href="/view/product/productByLeibie.html?leibieId=28"># 乒乓球</a>
+                                <a href="/view/product/productByLeibie.html?leibieId=29"># 羽毛球</a>
+                            </div>
+                            <div class="hero-actions">
+                                <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">
+                                    探索装备 <i class="bi bi-arrow-right"></i>
+                                </a>
+                                <a href="#hot-products" class="sports-btn sports-btn--ghost">
+                                    查看热销 <i class="bi bi-arrow-down-right"></i>
+                                </a>
+                            </div>
+                            <div class="hero-stats">
+                                <div class="hero-stat"><strong>04</strong><span>运动品类</span></div>
+                                <div class="hero-stat"><strong>100%</strong><span>正品精选</span></div>
+                                <div class="hero-stat"><strong>24H</strong><span>校园选装备</span></div>
+                            </div>
+                        </div>
+                        <div class="hero-visual">
+                            <div class="hero-photo-frame"></div>
+                            <img src="/images/22.jpg" class="hero-photo" alt="校园运动装备展示">
+                            <div class="hero-number">01</div>
+                            <div class="hero-floating-card">
+                                <span class="hero-floating-card__icon"><i class="bi bi-activity"></i></span>
+                                <span>
+                                    <strong>本周训练装备已上新</strong>
+                                    <small>轻盈上场 · 状态满格</small>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <div class="container">
+                <div class="category-rail">
+                    <div class="category-rail__inner">
+                        <a href="/view/product/productByLeibie.html?leibieId=26" class="category-item">
+                            <span class="category-item__icon"><i class="bi bi-dribbble"></i></span>
+                            <span><strong>篮球 / 足球</strong><small>Court Energy</small></span>
+                        </a>
+                        <a href="/view/product/productByLeibie.html?leibieId=27" class="category-item">
+                            <span class="category-item__icon"><i class="bi bi-record-circle"></i></span>
+                            <span><strong>网球运动</strong><small>Tennis Club</small></span>
+                        </a>
+                        <a href="/view/product/productByLeibie.html?leibieId=28" class="category-item">
+                            <span class="category-item__icon"><i class="bi bi-circle-fill"></i></span>
+                            <span><strong>乒乓球运动</strong><small>Table Tennis</small></span>
+                        </a>
+                        <a href="/view/product/productByLeibie.html?leibieId=29" class="category-item">
+                            <span class="category-item__icon"><i class="bi bi-lightning-charge-fill"></i></span>
+                            <span><strong>羽毛球运动</strong><small>Badminton</small></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="sports-ticker" aria-hidden="true">
+                <div class="sports-ticker__track">
+                    <span>Campus Sports</span>
+                    <span>Basketball / Football</span>
+                    <span>Tennis Club</span>
+                    <span>Table Tennis</span>
+                    <span>Badminton Life</span>
+                    <span>Train Hard · Play Smart</span>
+                    <span>Campus Sports</span>
+                    <span>Basketball / Football</span>
+                    <span>Tennis Club</span>
+                    <span>Table Tennis</span>
+                    <span>Badminton Life</span>
+                    <span>Train Hard · Play Smart</span>
+                </div>
+            </div>
+
+            <section class="sports-section">
+                <div class="container">
+                    <div class="section-heading">
+                        <div>
+                            <span class="section-kicker">New Arrivals</span>
+                            <h2>最新上架</h2>
+                            <p>把新的装备带进训练场。每一件都值得被认真挑选，也值得陪你多打一场。</p>
+                        </div>
+                        <a href="/view/product/productSea.html" class="section-link">全部装备 <i class="bi bi-arrow-up-right"></i></a>
+                    </div>
+                    <div class="row product-grid-row">
+                        <div class="col-lg-3 col-md-6 col-12" v-for="(product, index) in productList" :key="product.id">
+                            <article class="product-card">
+                                <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__media">
+                                    <span class="product-card__badge">New</span>
+                                    <img :src="product.image" @error="useFallbackImage" :alt="product.title">
+                                </a>
+                                <div class="product-card__body">
+                                    <div class="product-card__category">Campus Pick / 校园精选</div>
+                                    <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__title">{{product.title}}</a>
+                                    <div class="product-card__footer">
+                                        <div>
+                                            <div class="product-price"><small>¥</small>{{product.price}}</div>
+                                            <div class="product-meta">已售 {{product.xiaoliang || 0}} 件</div>
+                                        </div>
+                                        <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__arrow" aria-label="查看商品">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="empty-state" v-if="!productList.length">
+                        <i class="bi bi-basket2"></i>
+                        <strong>装备正在上架</strong>
+                        先去逛逛其他运动分类吧
+                    </div>
+                </div>
+            </section>
+
+            <section class="sports-section sports-section--paper">
+                <div class="container">
+                    <div class="campaign-grid">
+                        <div class="campaign-card">
+                            <span class="campaign-card__eyebrow">Weekly Drop / 校园运动企划</span>
+                            <i class="bi bi-trophy-fill campaign-card__icon"></i>
+                            <h3>本周装备<br>轻盈上场</h3>
+                            <p>为训练减负，为热爱加码。精选球类与训练装备，陪你从课后练习走到校园赛场。</p>
+                            <a href="/view/product/productByLeibie.html?leibieId=26" class="sports-btn sports-btn--lime">
+                                去逛球场装备 <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                        <div class="notice-panel">
+                            <div class="panel-heading">
+                                <h3>系统公告</h3>
+                                <a href="/view/gonggao/gonggaoAll.html">查看全部 <i class="bi bi-arrow-right"></i></a>
+                            </div>
+                            <a class="notice-item" v-for="(gonggao, index) in gonggaoList" :key="gonggao.id"
+                               :href="'/view/gonggao/gonggaoDetailQian.html?id='+gonggao.id">
+                                <span class="notice-item__index">{{String(index + 1).padStart(2, '0')}}</span>
+                                <span class="notice-item__title">{{gonggao.biaoti}}</span>
+                                <span class="notice-item__date">{{gonggao.shijian}}</span>
+                                <i class="bi bi-arrow-up-right notice-item__arrow"></i>
+                            </a>
+                            <div class="empty-state" v-if="!gonggaoList.length">
+                                <i class="bi bi-megaphone"></i>
+                                <strong>暂无公告</strong>
+                                新的校园运动资讯正在路上
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="sports-section" id="hot-products">
+                <div class="container">
+                    <div class="section-heading">
+                        <div>
+                            <span class="section-kicker">Hot Picks</span>
+                            <h2>热销排行</h2>
+                            <p>同学们正在买什么？从高人气装备里，找到适合你的下一件训练搭子。</p>
+                        </div>
+                        <a href="/view/product/productSea.html" class="section-link">发现更多 <i class="bi bi-arrow-up-right"></i></a>
+                    </div>
+                    <div class="row product-grid-row">
+                        <div class="col-lg-3 col-md-6 col-12" v-for="(product, index) in productList1" :key="product.id">
+                            <article class="product-card">
+                                <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__media">
+                                    <span class="product-card__badge product-card__badge--orange">Hot {{index + 1}}</span>
+                                    <img :src="product.image" @error="useFallbackImage" :alt="product.title">
+                                </a>
+                                <div class="product-card__body">
+                                    <div class="product-card__category">Campus Best Seller</div>
+                                    <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__title">{{product.title}}</a>
+                                    <div class="product-card__footer">
+                                        <div>
+                                            <div class="product-price"><small>¥</small>{{product.price}}</div>
+                                            <div class="product-meta">已售 {{product.xiaoliang || 0}} 件</div>
+                                        </div>
+                                        <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__arrow" aria-label="查看商品">
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                    <div class="empty-state" v-if="!productList1.length">
+                        <i class="bi bi-trophy"></i>
+                        <strong>热销榜单准备中</strong>
+                        热门装备很快与你见面
+                    </div>
+                    <div class="benefit-strip">
+                        <div class="benefit-item">
+                            <span class="benefit-item__icon"><i class="bi bi-patch-check-fill"></i></span>
+                            <span><strong>校园正品精选</strong><span>严选运动品牌与实用装备</span></span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-item__icon"><i class="bi bi-mortarboard-fill"></i></span>
+                            <span><strong>为大学生而选</strong><span>兼顾专业性能与校园预算</span></span>
+                        </div>
+                        <div class="benefit-item">
+                            <span class="benefit-item__icon"><i class="bi bi-box-seam"></i></span>
+                            <span><strong>下单安心到家</strong><span>库存透明，购物流程清晰</span></span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <my-foot></my-foot>
+        
+</div>        
+<script>
+
+    new Vue({
+        el: '#app',
+        data: 
+		{
+			msg: "111",
+			jieshao:{
+												
+			},
+			
+			total:0,
+			pageSize:64,
+			currentPage:1,//当前页
+
+			xinwenList:[],
+            gonggaoList:[],
+            productList:[],
+            productList1:[],
+		},
+		
+		methods: 
+		{
+			useFallbackImage(event)
+			{
+				var fallback = "/images/product-placeholder.svg";
+				if (event.target.src.indexOf(fallback) === -1)
+				{
+					event.target.src = fallback;
+				}
+			},
+
+			getData()
+			{
+				axios({
+					method: 'POST',
+					url: '/productQian4',
+					params:{
+						
+					}
+					}).then(data => {
+						if (data.data.state == 66)
+						{
+							this.productList=data.data.data;
+						} 
+					    
+					}).catch(error => {
+						alert(error);
+		          })
+			},
+			
+			getData1()
+			{
+				axios({
+					method: 'POST',
+					url: '/gonggaoQian3',
+					params:{
+						
+					}
+					}).then(data => {
+						if (data.data.state == 66)
+						{
+							this.gonggaoList=data.data.data;
+						} 
+					    
+					}).catch(error => {
+						alert(error);
+		          })
+			},
+			
+			
+			getData2()
+			{
+				axios({
+					method: 'POST',
+					url: '/xinwenQian3',
+					params:{
+						
+					}
+					}).then(data => {
+						if (data.data.state == 66)
+						{
+							this.xinwenList=data.data.data;
+						} 
+					    
+					}).catch(error => {
+						alert(error);
+		          })
+			},
+			
+			getData3()
+			{
+               axios({
+						method: 'POST',
+						url: '/xiaoliangQian4',
+						params:{
+							
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.productList1=data.data.data;
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+		},
+		
+		
+		
+		created()
+		{
+			this.getData();
+			this.getData1();
+			this.getData2();
+			this.getData3();
+		},
+		
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue'),
+        }
+    })
+</script>
+
+        <script src="../js/jquery.min.js"></script>
+        <script src="../js/bootstrap.min.js"></script>
+        
+    </body>
+</html>

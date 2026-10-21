@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="大学生体育用品搜索结果，发现适合校园训练与比赛的装备。">
+    <meta name="author" content="跃动体育">
+    <title>搜索结果｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero sports-page-hero--art">
+            <div class="sports-page-hero__art" aria-hidden="true">
+                <img src="/images/33.jpg" alt="">
+            </div>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <a href="/view/product/productSea.html">装备搜索</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>搜索结果</span>
+                </div>
+                <span class="sports-page-hero__kicker">Search Results / 搜索结果</span>
+                <h1>“{{keyword}}”的装备</h1>
+                <p>为你的搜索找到合适的运动装备。选中趁手的那一件，把训练状态带到校园赛场。</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <form class="search-panel" @submit.prevent="productRes()">
+                    <span class="search-panel__icon"><i class="bi bi-search"></i></span>
+                    <input type="text" v-model="searchText" placeholder="继续搜索其他装备" autocomplete="off">
+                    <input type="button" value="重新搜索" @click="productRes()">
+                </form>
+
+                <div class="filter-row">
+                    <span class="filter-row__label">快速筛选</span>
+                    <a class="filter-chip" href="/view/product/productRes.html?title=篮球">篮球</a>
+                    <a class="filter-chip" href="/view/product/productRes.html?title=足球">足球</a>
+                    <a class="filter-chip" href="/view/product/productRes.html?title=网球">网球</a>
+                    <a class="filter-chip" href="/view/product/productRes.html?title=乒乓球">乒乓球</a>
+                    <a class="filter-chip" href="/view/product/productRes.html?title=羽毛球">羽毛球</a>
+                </div>
+
+                <div class="shop-toolbar">
+                    <div>
+                        <span class="sports-eyebrow">Campus Equipment</span>
+                        <h2>找到 {{productList.length}} 件装备</h2>
+                        <p>搜索结果来自跃动体育商品库</p>
+                    </div>
+                    <span class="result-count"><i class="bi bi-check2-circle"></i> 正品精选</span>
+                </div>
+
+                <div class="row product-grid-row" v-if="productList.length">
+                    <div class="col-lg-3 col-md-6 col-12" v-for="(product, index) in productList" :key="product.id">
+                        <article class="product-card">
+                            <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__media">
+                                <span class="product-card__badge">Match {{String(index + 1).padStart(2, '0')}}</span>
+                                <img :src="product.image" @error="useFallbackImage" :alt="product.title">
+                            </a>
+                            <div class="product-card__body">
+                                <div class="product-card__category">Search Pick / 搜索精选</div>
+                                <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__title">{{product.title}}</a>
+                                <div class="product-card__footer">
+                                    <div>
+                                        <div class="product-price"><small>¥</small>{{product.price}}</div>
+                                        <div class="product-meta">已售 {{product.xiaoliang || 0}} 件 · 库存 {{product.kucun || 0}}</div>
+                                    </div>
+                                    <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__arrow" aria-label="查看商品">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="empty-state" v-else>
+                    <i class="bi bi-search"></i>
+                    <strong>没有找到相关装备</strong>
+                    换个关键词试试，或去装备分类里慢慢逛
+                    <div class="mt-3">
+                        <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">重新搜索 <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    var initialTitle = getUrlParam("title") || "";
+    try {
+        initialTitle = decodeURIComponent(initialTitle);
+    } catch (e) {
+        initialTitle = getUrlParam("title") || "";
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            productList: [],
+            keyword: initialTitle,
+            searchText: initialTitle
+        },
+
+        methods: {
+            getData() {
+                axios({
+                    method: 'POST',
+                    url: '/productRes',
+                    params: {
+                        title: this.keyword
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.productList = data.data.data;
+                        document.title = "“" + this.keyword + "”搜索结果｜跃动体育";
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            productRes() {
+                var keyword = this.searchText.trim();
+                if (!keyword) {
+                    alert("请输入要搜索的商品名称");
+                    return;
+                }
+                window.location.href = "/view/product/productRes.html?title=" + encodeURIComponent(keyword);
+            },
+
+            useFallbackImage(event) {
+                var fallback = "/images/product-placeholder.svg";
+                if (event.target.src.indexOf(fallback) === -1) {
+                    event.target.src = fallback;
+                }
+            }
+        },
+
+        created() {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

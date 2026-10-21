@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.LeibieMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_leibie(
+			mingcheng,
+			jieshao,
+			del
+       ) values 
+       (
+            #{mingcheng},
+			#{jieshao},
+			#{del}
+       )
+   </insert>
+   
+   
+   <update id="delete">
+       update t_leibie set del='yes' where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <update id="update">
+       update t_leibie set 
+            mingcheng=#{mingcheng},  
+            jieshao=#{jieshao}
+            where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <select id="select" resultType="com.xiangmu.pojo.Leibie">
+      select * from t_leibie where del='no' and mingcheng like "%" #{mingcheng} "%"
+   </select>
+   
+   
+   
+   <select id="findBymingcheng" resultType="com.xiangmu.pojo.Leibie">
+      select * from t_leibie where del='no' and mingcheng = #{mingcheng}
+   </select>
+   
+   
+   
+   
+   
+   <select id="findByid" resultType="com.xiangmu.pojo.Leibie">
+      select * from t_leibie where del='no' and id =#{id}
+   </select>
+   
+  
+   
+   
+   
+   
+</mapper>
+
+  
+  

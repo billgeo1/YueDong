@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+<style scoped>
+	/* input{border: 1px solid #ccc: padding: 5px 0px; border-radius: 3px; padding-left:5px; }
+	*{color: #848482:}*/
+ 
+
+</style>
+
+<link href="/css/base.css" rel="stylesheet" type="text/css">
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script src="/js/vue.min.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/ckeditor/ckeditor.js"></script>
+	
+<script type="text/javascript">
+	function getUrlParam(name) 
+	{
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+		if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+	
+	function timeStamp2String(time)
+	{
+
+	    var datetime = new Date();
+
+	    datetime.setTime(time);
+
+	    var year = datetime.getFullYear();
+
+	    var month = datetime.getMonth() + 1 < 10 ? "0" + (datetime.getMonth() + 1) : datetime.getMonth() + 1;
+
+	    var date = datetime.getDate() < 10 ? "0" + datetime.getDate() : datetime.getDate();
+
+	    var hour = datetime.getHours()< 10 ? "0" + datetime.getHours() : datetime.getHours();
+
+	    var minute = datetime.getMinutes()< 10 ? "0" + datetime.getMinutes() : datetime.getMinutes();
+
+
+	    return year + "-" + month + "-" + date+" "+hour+":"+minute;
+	}
+	
+	function getshijian()
+	{
+		 document.getElementById("shijian").value=timeStamp2String(new Date().getTime());
+	}
+
+	function duihuanAdd()
+	{
+		if(document.formAdd.lipin.value=="")
+        {
+            alert("请选择礼品");
+            return false;
+        } 
+		
+		var jifenMy = getUrlParam('jifenMy');
+        if(document.formAdd.lipin.value=="聚宝盆")
+        {
+            var suoxujifen=5000
+            if(suoxujifen > jifenMy)
+           	{
+            	alert("积分不够");
+            	return false;
+           	}
+            
+        }
+        if(document.formAdd.lipin.value=="保温杯")
+        {
+            var suoxujifen=10000
+            if(suoxujifen > jifenMy)
+           	{
+            	alert("积分不够");
+            	return false;
+           	}
+            
+        }
+        
+        if(document.formAdd.dizhi.value=="")
+        {
+            alert("请输入收货地址");
+            return false;
+        } 
+        if(document.formAdd.dianhua.value=="")
+        {
+            alert("请输入联系电话");
+            return false;
+        } 
+        
+        document.formAdd.submit();
+	}
+</script>
+	  
+</head>
+
+<body onload="getshijian()">
+  <div id="duihuanDiv">
+  <form action="/duihuanAdd" name="formAdd" method="get">
+	       <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#CBD8AC" style="margin-bottom:8px">
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         礼品：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						           <table>
+						              <tr>
+						                 <td align="left" valign="top" width="260">
+						                    <img src="/images/pen.jpg" width="150" height="120"><br>
+						                    <input type="radio" name="lipin" value="聚宝盆" 
+						                        style="border: 0px;">聚宝盆（5000积分）
+						                 </td>
+						                 <td align="left" valign="top" width="260">
+						                    <img src="/images/beizi.jpg" width="150" height="120"><br>
+						                    <input type="radio" name="lipin" value="保温杯" 
+						                        style="border: 0px;">保温杯（10000积分）
+						                 </td>
+						              </tr>
+						           </table>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 75px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          提交时间：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="shijian" id="shijian" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         姓名：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="xingming" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         收货地址：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="dizhi" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         电话：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="dianhua" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         备注：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="beizhu" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="10" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" onclick="duihuanAdd()" class="button blue" />&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+		</form>
+  </div>
+  
+
+
+<script type="text/javascript">
+
+		
+</script>
+
+
+
+
+
+</body>
+</html>

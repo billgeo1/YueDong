@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.PingjiaMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_pingjia
+       (
+            userId,
+			productId,
+			shuxing,
+			
+			neirong,
+			shijian
+       ) 
+       values 
+       (
+            #{userId},
+			#{productId},
+			#{shuxing},
+			
+			#{neirong},
+			#{shijian}
+       )
+   </insert>
+   
+   
+   
+   
+   
+   <delete id="delete">
+       delete from t_pingjia where id=#{id}
+   </delete>
+   
+   
+   
+   
+   
+   
+   
+   <update id="update">
+       update t_pingjia set 
+            shuxing=#{shuxing},  
+            neirong=#{neirong},
+            shijian=#{shijian} 
+            where id= #{id}
+   </update>
+   
+   
+      
+   
+   
+    
+   
+   
+   <select id="selectAll" resultType="com.xiangmu.pojo.Pingjia">
+      select * from t_pingjia where shuxing like "%" #{shuxing} "%" order by id desc
+   </select>
+   
+   
+   
+   <select id="selectByUserId" resultType="com.xiangmu.pojo.Pingjia">
+      select * from t_pingjia where userId =#{userId}
+   </select>
+   
+   
+   <select id="selectByShuxingAndProduct" resultType="com.xiangmu.pojo.Pingjia">
+      select * from t_pingjia where productId =#{productId} and shuxing =#{shuxing} order by id desc
+   </select>
+   
+   
+   
+   
+   <select id="findById" resultType="com.xiangmu.pojo.Pingjia">
+      select * from t_pingjia where id =#{id}
+   </select>
+   
+   
+   
+   
+   
+   
+   
+   
+</mapper>
+
+  
+  

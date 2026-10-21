@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+<style scoped>
+	/* input{border: 1px solid #ccc: padding: 5px 0px; border-radius: 3px; padding-left:5px; }
+	*{color: #848482:}*/
+ 
+
+</style>
+
+
+<script src="/js/vue.min.js"></script>
+
+<link href="/css/base.css" rel="stylesheet" type="text/css">
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+
+<script src="/ckeditor/ckeditor.js"></script>
+           
+</head>
+
+<body >
+  <div id="gonggaoDiv">
+	       <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#F5F5F5" style="margin-bottom:8px">
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        信息标题：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" v-model.trim="gonggao.biaoti" size="55"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        信息内容：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <textarea class="ckeditor" name="neirong"></textarea>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          附件上传：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+								<input type="text" size="60" readonly="readonly" v-model="gonggao.fujian"/><br/>
+						        <input type="file" ref="fileRef" accept="*" @change="handleFileChange($event)"/>
+								<input type="button" value="上传" style="width: 66px;" @click="upload()"/>
+								<input type="hidden" size="60" readonly="readonly" v-model="gonggao.fujianYuan"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          提交时间：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" v-model="gonggao.shijian" size="35" />
+						    </td>
+						</tr>
+						
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="gonggaoAdd()" class="lanse" style="width: 86px;"/>&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#gonggaoDiv',
+		data: 
+		{
+			gonggao:{
+				id:'',
+				biaoti:'',
+				neirong:'',
+				fujian:'',fujianYuan:'',
+								
+				shijian:'',
+			},
+
+			file:"",
+		},
+		methods: 
+		{
+			gonggaoAdd()
+			{
+				var txt = CKEDITOR.instances.neirong.getData(); 
+				this.gonggao.neirong=txt;
+
+				if(this.gonggao.biaoti =="")
+				{
+					alert("请输入信息标题");return false;
+				} 
+				
+				this.add();
+			},
+
+			add()
+			{
+				axios({
+						method: 'POST',
+						url: '/gonggaoAdd',
+						data: this.gonggao,
+						/* params:{
+							username:this.gonggao.userName,
+							password:this.gonggao.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("添加成功");
+								location.href="/admin/gonggao/gonggaoMana.html";
+							} 
+						    
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+			
+
+			handleFileChange(event) 
+			{
+				this.file = event.target.files[0];
+			},
+
+			upload()
+			{
+				/* if(this.$refs.fileRef.value=="") */
+				if(this.file=="")
+				{
+					alert("请选择文件");
+					return false;
+				}
+
+				let formFile = new FormData();
+				formFile.append("file", this.file);
+				
+                axios({
+						method: 'POST',
+						url: '/upload',
+						data: formFile, 
+						/* params:{
+							username:this.gonggao.userName,
+							password:this.gonggao.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("上传成功");
+								this.file='';
+								var fujian=data.data.data; 
+								this.gonggao.fujian=fujian.fujian;
+								this.gonggao.fujianYuan=fujian.fujianYuan;
+							} 
+						}).catch(error => {
+							alert(error);
+				})
+
+
+			},
+
+			
+			/* 获取系统时间 */
+			padLeftZero (str)
+			{
+			return ('00' + str).substr(str.length);
+			},
+
+			formateDate(date, fmt)
+			{
+			if (/(y+)/.test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+			}
+			let o = {
+			'M+': date.getMonth() + 1,
+			'd+': date.getDate(),
+			'h+': date.getHours(),
+			'm+': date.getMinutes(),
+			's+': date.getSeconds()
+			}
+			for (let k in o) {
+			if (new RegExp(`(${k})`).test(fmt)) {
+			let str = o[k] + '';
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str));
+			}
+			}
+			return fmt;
+			},
+			/* 获取系统时间 */
+
+			
+		},
+
+		created()
+		{
+			this.gonggao.shijian=this.formateDate(new Date(), 'yyyy-MM-dd hh:mm');
+		}
+	
+	    
+	})
+</script>
+
+
+
+
+
+</body>
+</html>

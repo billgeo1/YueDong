@@ -1,0 +1,342 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育购物车，查看大学生运动装备清单、调整数量并快速进入结算。">
+    <meta name="author" content="跃动体育">
+
+    <title>我的购物车｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>我的购物车</span>
+                </div>
+                <span class="sports-page-hero__kicker">My Gear Bag / 我的装备袋</span>
+                <h1>装备清单，准备上场</h1>
+                <p>确认你的运动装备与数量，库存实时校验，下一步就能完成结算。</p>
+                <div class="hero-tags">
+                    <span><i class="bi bi-shield-check"></i> 正品装备</span>
+                    <span><i class="bi bi-truck"></i> 校园配送</span>
+                    <span><i class="bi bi-arrow-repeat"></i> 数量可调</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="cart-layout">
+                    <div class="cart-panel">
+                        <div class="cart-panel__head">
+                            <h2>购物车清单</h2>
+                            <span>{{cartList.length}} 件装备 · 共 {{totalQty}} 件商品</span>
+                        </div>
+
+                        <template v-if="cartList.length">
+                            <div class="cart-item" v-for="(cart, index) in cartList" :key="cart.id">
+                                <a class="cart-item__image"
+                                   :href="'/view/product/productDetailQian.html?id='+cart.productId">
+                                    <img :src="cart.product.image || '/images/product-placeholder.svg'"
+                                         @error="useFallbackImage"
+                                         :alt="cart.product.title">
+                                </a>
+
+                                <div class="cart-item__body">
+                                    <a class="cart-item__title"
+                                       :href="'/view/product/productDetailQian.html?id='+cart.productId">
+                                        {{cart.product.title}}
+                                    </a>
+                                    <span class="cart-item__note">
+                                        <i class="bi bi-lightning-charge"></i> 校园运动装备 · 库存实时校验
+                                    </span>
+                                </div>
+
+                                <span class="cart-item__price"><small>¥</small>{{cart.product.price}}</span>
+
+                                <div class="qty-control">
+                                    <input type="button" value="−" aria-label="减少数量" @click="subNum(cart)">
+                                    <input type="text" readonly="readonly" aria-label="商品数量" v-model="cart.shuliang">
+                                    <input type="button" value="+" aria-label="增加数量" @click="addNum(cart)">
+                                </div>
+
+                                <strong class="cart-item__subtotal">
+                                    <small>¥</small>{{cart.shuliang * cart.product.price}}
+                                </strong>
+
+                                <button type="button"
+                                        class="cart-item__remove"
+                                        aria-label="删除商品"
+                                        @click="cartDel(cart.id)">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </div>
+                        </template>
+
+                        <div class="empty-state" v-else>
+                            <i class="bi bi-bag"></i>
+                            <strong>购物车还是空的</strong>
+                            去挑一件适合下一场训练的装备吧
+                            <div class="mt-3">
+                                <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">
+                                    去逛装备 <i class="bi bi-arrow-right"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <aside class="cart-summary">
+                        <span class="cart-summary__kicker">Order Summary</span>
+                        <h2>结算清单</h2>
+
+                        <div class="cart-summary__row">
+                            <span>商品件数</span>
+                            <strong>{{totalQty}} 件</strong>
+                        </div>
+                        <div class="cart-summary__row">
+                            <span>配送方式</span>
+                            <strong>校园配送</strong>
+                        </div>
+                        <div class="cart-summary__row">
+                            <span>学生优惠</span>
+                            <strong>已享校园价</strong>
+                        </div>
+
+                        <div class="cart-summary__total">
+                            <span>合计金额</span>
+                            <strong><small>¥</small>{{zongjine}}</strong>
+                        </div>
+
+                        <button type="button" class="sports-btn sports-btn--lime" @click="jiesuanPre()">
+                            去结算 <i class="bi bi-arrow-right"></i>
+                        </button>
+                        <button type="button" class="sports-btn cart-summary__secondary" @click="cartQingkong()">
+                            <i class="bi bi-trash3"></i> 清空购物车
+                        </button>
+
+                        <p class="cart-summary__help">
+                            <i class="bi bi-shield-check"></i> 结算前会校验库存，支付页面支持微信与支付宝扫码。
+                        </p>
+                    </aside>
+                </div>
+
+                <div class="benefit-strip">
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-patch-check"></i></span>
+                        <span><strong>校园精选</strong><span>面向大学生的运动装备清单</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-box-seam"></i></span>
+                        <span><strong>库存同步</strong><span>下单前实时确认可售数量</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-credit-card-2-front"></i></span>
+                        <span><strong>快捷支付</strong><span>微信、支付宝扫码完成付款</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            cartList: []
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/cartMine',
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.cartList = data.data.data || [];
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            subNum(cart)
+            {
+                if (cart.shuliang > 1)
+                {
+                    cart.shuliang--;
+                    axios({
+                        method: 'POST',
+                        url: '/cartShuliangUpDate',
+                        params: {
+                            shuliang: cart.shuliang,
+                            id: cart.id
+                        }
+                    }).then(data => {
+                        if (data.data.state == 66)
+                        {
+                        }
+                    }).catch(error => {
+                        alert(error);
+                    })
+                }
+            },
+
+            addNum(cart)
+            {
+                axios({
+                    method: 'POST',
+                    url: '/getKucun',
+                    params: {
+                        id: cart.productId
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        var kucun = data.data.data;
+                        if (cart.shuliang >= kucun)
+                        {
+                            alert("库存不足");
+                            return false;
+                        }
+
+                        cart.shuliang++;
+                        axios({
+                            method: 'POST',
+                            url: '/cartShuliangUpDate',
+                            params: {
+                                shuliang: cart.shuliang,
+                                id: cart.id
+                            }
+                        }).then(data => {
+                            if (data.data.state == 66)
+                            {
+                            }
+                        }).catch(error => {
+                            alert(error);
+                        })
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            cartDel(id)
+            {
+                axios({
+                    method: 'POST',
+                    url: '/cartDel',
+                    params: {
+                        id: id
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        alert("删除成功");
+                        window.location.reload();
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            cartQingkong()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/cartQingkong',
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        alert("操作成功");
+                        window.location.reload();
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            jiesuanPre()
+            {
+                if (this.zongjine == 0)
+                {
+                    alert("购物车是空的");
+                    return false;
+                }
+                window.location.href = "/view/jiesuan/jiesuan.html?zongjine=" + this.zongjine;
+            },
+
+            useFallbackImage(event)
+            {
+                var fallback = "/images/product-placeholder.svg";
+                if (event.target.src.indexOf(fallback) === -1)
+                {
+                    event.target.src = fallback;
+                }
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        computed: {
+            totalQty: function()
+            {
+                let total = 0;
+                for (let i = 0; i < this.cartList.length; i++)
+                {
+                    total += parseInt(this.cartList[i].shuliang);
+                }
+                return total;
+            },
+
+            zongjine: function()
+            {
+                let total = 0;
+                for (let i = 0; i < this.cartList.length; i++)
+                {
+                    total += parseInt(this.cartList[i].shuliang) * parseInt(this.cartList[i].product.price);
+                }
+                return total;
+            }
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

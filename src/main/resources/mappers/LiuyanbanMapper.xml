@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.LiuyanbanMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_liuyanban(
+			user_id,
+			neirong,
+			liuyanshi,
+			huifu,
+			
+			huifushi
+       ) values 
+       (
+            #{user_id},
+			#{neirong},
+			#{liuyanshi},
+			#{huifu},
+			
+			#{huifushi}
+       )
+   </insert>
+   
+   
+   <update id="delete">
+       delete from t_liuyanban where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <update id="update">
+       update t_liuyanban set 
+            huifu=#{huifu},
+            huifushi=#{huifushi}
+            
+            where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <select id="select" resultType="com.xiangmu.pojo.Liuyanban">
+      select * from t_liuyanban where neirong like "%" #{neirong} "%" order by id desc
+   </select>
+   
+   
+   
+   
+   
+   <select id="findByid" resultType="com.xiangmu.pojo.Liuyanban">
+      select * from t_liuyanban where id =#{id}
+   </select>
+   
+  
+   
+   
+   
+   
+</mapper>
+
+  
+  

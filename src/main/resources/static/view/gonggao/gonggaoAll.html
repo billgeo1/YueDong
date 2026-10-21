@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育系统公告，及时了解校园体育用品网的课程调整、活动通知与服务提醒。">
+    <meta name="author" content="跃动体育">
+
+    <title>系统公告｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>系统公告</span>
+                </div>
+                <span class="sports-page-hero__kicker">Campus Noticeboard / 校园公告板</span>
+                <h1>重要消息，第一时间知道</h1>
+                <p>课程安排、校园活动和服务提醒集中发布。训练之前看一眼，别错过每一次上场机会。</p>
+                <div class="hero-tags">
+                    <span><i class="bi bi-megaphone"></i> 及时通知</span>
+                    <span><i class="bi bi-calendar-check"></i> 校园活动</span>
+                    <span><i class="bi bi-shield-check"></i> 服务提醒</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="shop-toolbar">
+                    <div>
+                        <span class="sports-eyebrow">Stay in the Loop</span>
+                        <h2>最新公告</h2>
+                        <p>场地、课程与装备服务动态，一次看清</p>
+                    </div>
+                    <span class="result-count"><i class="bi bi-bell-fill"></i> 共 {{total}} 条</span>
+                </div>
+
+                <div class="notice-list-card" v-if="gonggaoList.length">
+                    <a class="notice-item"
+                       v-for="(gonggao, index) in gonggaoList"
+                       :key="gonggao.id"
+                       :href="'/view/gonggao/gonggaoDetailQian.html?id='+gonggao.id">
+                        <span class="notice-item__index">{{String(index + 1).padStart(2, '0')}}</span>
+                        <span class="notice-item__title">
+                            <i class="bi bi-megaphone"></i>
+                            {{gonggao.biaoti}}
+                        </span>
+                        <span class="notice-item__date">{{gonggao.shijian}}</span>
+                        <span class="notice-item__arrow"><i class="bi bi-arrow-up-right"></i></span>
+                    </a>
+                </div>
+
+                <div class="empty-state" v-else>
+                    <i class="bi bi-megaphone"></i>
+                    <strong>暂时没有新的公告</strong>
+                    有新消息时，我们会第一时间发布在这里
+                </div>
+
+                <div class="benefit-strip">
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-lightning-charge"></i></span>
+                        <span><strong>即时更新</strong><span>重要调整第一时间同步</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-people"></i></span>
+                        <span><strong>校园共创</strong><span>活动与社团动态集中发布</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-bag-check"></i></span>
+                        <span><strong>服务在线</strong><span>装备与订单问题及时响应</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            gonggaoList: [],
+            total: 0
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/gonggaoAll',
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.gonggaoList = data.data.data || [];
+                        this.total = this.gonggaoList.length;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

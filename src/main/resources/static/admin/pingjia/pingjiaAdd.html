@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+<style scoped>
+	/* input{border: 1px solid #ccc: padding: 5px 0px; border-radius: 3px; padding-left:5px; }
+	*{color: #848482:}*/
+ 
+
+</style>
+
+<link href="/css/base.css" rel="stylesheet" type="text/css">
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script src="/js/vue.min.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/ckeditor/ckeditor.js"></script>
+	
+<script type="text/javascript">
+	function getUrlParam(name) 
+	{
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+		if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+			    
+</script>
+	  
+</head>
+
+<body >
+  <div id="pingjiaDiv">
+	       <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#CBD8AC" style="margin-bottom:8px">
+						
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         属性：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="radio" name="shuxing" value="好评" v-model="pingjia.shuxing" style="border: 0px;">好评&nbsp;&nbsp;
+						        <input type="radio" name="shuxing" value="中评" v-model="pingjia.shuxing" style="border: 0px;">中评&nbsp;&nbsp;
+						        <input type="radio" name="shuxing" value="差评" v-model="pingjia.shuxing" style="border: 0px;">差评&nbsp;&nbsp;
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         评价内容：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <textarea rows="4" cols="50" name="neirong" v-model.trim="pingjia.neirong"></textarea>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          时间：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="shijian" v-model="pingjia.shijian" size="22" value=""/>
+						    </td>
+						</tr>
+						<tr align='center' bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="10" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="pingjiaAdd()" class="button blue" />&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#pingjiaDiv',
+		data: 
+		{
+			pingjia:{
+				id:'',
+				userId:'',
+				productId:getUrlParam('productId'),
+				shuxing:'好评',
+
+				neirong:'',
+				shijian:'',
+			},
+
+			file:"",
+		},
+		methods: 
+		{
+			pingjiaAdd()
+			{
+				if(this.pingjia.neirong =="")
+				{
+					alert("请输入评价内容");return false;
+				} 
+				
+				axios({
+						method: 'POST',
+						url: '/pingjiaAdd',
+						data: this.pingjia,
+						/* params:{
+							username:this.pingjia.userName,
+							password:this.pingjia.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("评价成功");
+								var index = parent.layer.getFrameIndex(window.name);
+				                parent.layer.close(index);//关闭当前页
+								
+							} 
+						    
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+
+			
+			/* 获取系统时间 */
+			padLeftZero (str)
+			{
+			return ('00' + str).substr(str.length);
+			},
+
+			formateDate(date, fmt)
+			{
+			if (/(y+)/.test(fmt)) {
+			fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+			}
+			let o = {
+			'M+': date.getMonth() + 1,
+			'd+': date.getDate(),
+			'h+': date.getHours(),
+			'm+': date.getMinutes(),
+			's+': date.getSeconds()
+			}
+			for (let k in o) {
+			if (new RegExp(`(${k})`).test(fmt)) {
+			let str = o[k] + '';
+			fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str));
+			}
+			}
+			return fmt;
+			},
+			/* 获取系统时间 */
+
+			
+		},
+
+		created()
+		{
+			this.pingjia.shijian=this.formateDate(new Date(), 'yyyy-MM-dd hh:mm');
+		}
+	
+	    
+	})
+</script>
+
+
+
+
+
+</body>
+</html>

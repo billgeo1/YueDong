@@ -1,0 +1,133 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+
+<script src="/js/vue.min.js"></script>
+
+<script src="/elementui/index.js"></script>
+<link href="/elementui/index.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+<link href="/css/layui.css" rel="stylesheet" type="text/css">  
+<link href="/css/base.css" rel="stylesheet" type="text/css">  
+
+
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+	function getUrlParam(name) 
+	{
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+		if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+    
+</script>
+
+
+</head>
+
+<body style="margin: 13px;">
+  <div id="loginDiv">
+	<template>
+	</template>
+	<table class="layui-table">
+    <thead>
+      <tr>
+		<th>序号</th>
+		<!-- <th>productId</th> -->
+		<th>商品</th>
+		<th>单价</th>
+		
+		<th>数量</th>
+      </tr> 
+    </thead>
+    <tbody>
+      <tr v-for="(orderItem, index) in xianshilist" :key="orderItem.id">
+		<td>{{index+1}}</td>
+		<!-- <td>{{orderItem.productId}}</td> -->
+		<td>{{orderItem.title}}</td> 
+		<td>{{orderItem.jiage}}</td>
+		
+		<td>{{orderItem.shuliang}}</td>
+      </tr>
+    </tbody>
+    </table>
+
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#loginDiv',
+		data: 
+		{
+			total:0,
+			pageSize:2222,
+			currentPage:1,//当前页
+
+			orderItemList:[],
+			xianshilist: null,	
+
+			orderItem:{
+				
+			},
+
+			
+		},
+		methods: 
+		{
+			getData()
+			{
+               axios({
+						method: 'POST',
+						url: '/mingxi',
+						params:{
+							orderId:getUrlParam("orderId"),
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.orderItemList=data.data.data;
+								this.total=this.orderItemList.length;
+	                            this.xianshilist = this.orderItemList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+			
+			pingjiaAdd(productId)
+			{
+				var url="/admin/pingjia/pingjiaAdd.html?productId="+productId;
+				window.location.href=url;
+			},
+			
+
+		},
+		created()
+		{
+			this.getData();
+		}
+
+	
+	    
+	})
+</script>
+
+
+<style>
+    .el-pagination{
+		text-align: right;
+		padding-top: 20px;
+	}
+</style>
+
+</body>
+</html>

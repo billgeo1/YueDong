@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育运动资讯，发现校园训练方法、装备指南、赛事动态与大学生运动生活灵感。">
+    <meta name="author" content="跃动体育">
+
+    <title>运动资讯｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero sports-page-hero--art">
+            <div class="sports-page-hero__art" aria-hidden="true">
+                <img src="/images/33.jpg" alt="">
+            </div>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>运动资讯</span>
+                </div>
+                <span class="sports-page-hero__kicker">Campus Sports Journal / 校园运动志</span>
+                <h1>训练有方法，上场有底气</h1>
+                <p>关注校园赛事、训练技巧与装备选择。把专业运动知识，变成大学生每天都能用上的行动指南。</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="shop-toolbar">
+                    <div>
+                        <span class="sports-eyebrow">Latest Stories</span>
+                        <h2>最新运动资讯</h2>
+                        <p>训练灵感、赛事现场和装备知识，持续更新中</p>
+                    </div>
+                    <span class="result-count"><i class="bi bi-lightning-charge-fill"></i> 共 {{total}} 篇</span>
+                </div>
+
+                <div class="news-grid" v-if="xinwenList.length">
+                    <a class="news-card"
+                       v-for="(xinwen, index) in xinwenList"
+                       :key="xinwen.id"
+                       :href="'/view/xinwen/xinwenDetailQian.html?id='+xinwen.id">
+                        <img class="news-card__image"
+                             :src="xinwen.fujian || '/images/33.jpg'"
+                             @error="useFallbackImage"
+                             :alt="xinwen.biaoti">
+                        <div class="news-card__body">
+                            <div class="news-card__meta">
+                                <span>Campus Story {{String(index + 1).padStart(2, '0')}}</span>
+                                <span class="news-card__date">{{xinwen.shijian}}</span>
+                            </div>
+                            <h3>{{xinwen.biaoti}}</h3>
+                            <span class="news-card__more">阅读全文 <i class="bi bi-arrow-up-right"></i></span>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="empty-state" v-else>
+                    <i class="bi bi-newspaper"></i>
+                    <strong>运动资讯正在准备中</strong>
+                    新的训练故事很快就会来到这里
+                </div>
+
+                <div class="benefit-strip">
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-stopwatch"></i></span>
+                        <span><strong>训练技巧</strong><span>科学训练，稳步提升运动表现</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-trophy"></i></span>
+                        <span><strong>校园赛事</strong><span>关注大学生自己的运动现场</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-bag-check"></i></span>
+                        <span><strong>装备指南</strong><span>按运动场景挑选真正合适的装备</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            xinwenList: [],
+            total: 0
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/xinwenAll',
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.xinwenList = data.data.data;
+                        this.total = this.xinwenList.length;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            useFallbackImage(event)
+            {
+                var fallback = "/images/33.jpg";
+                if (event.target.src.indexOf(fallback) === -1)
+                {
+                    event.target.src = fallback;
+                }
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

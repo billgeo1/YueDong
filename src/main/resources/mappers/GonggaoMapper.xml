@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.GonggaoMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_gonggao(
+			biaoti,
+			neirong,
+			fujian,
+			fujianYuan,
+			
+			shijian
+       ) values 
+       (
+            #{biaoti},
+			#{neirong},
+			#{fujian},
+			#{fujianYuan},
+			
+			#{shijian}
+       )
+   </insert>
+   
+   
+   <update id="delete">
+       delete from t_gonggao where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <update id="update">
+       update t_gonggao set 
+            biaoti=#{biaoti},  
+            neirong=#{neirong}, 
+            fujian=#{fujian}, 
+            fujianYuan=#{fujianYuan}
+            
+            where id= #{id}
+   </update>
+   
+   
+   
+   
+   
+   <select id="select" resultType="com.xiangmu.pojo.Gonggao">
+      select * from t_gonggao where biaoti like "%" #{biaoti} "%" order by id desc
+   </select>
+   
+   
+   
+   
+   
+   <select id="findByid" resultType="com.xiangmu.pojo.Gonggao">
+      select * from t_gonggao where id =#{id}
+   </select>
+   
+  
+   
+   
+   
+   
+</mapper>
+
+  
+  

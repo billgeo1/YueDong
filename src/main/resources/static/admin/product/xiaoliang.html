@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+
+<script src="/js/echarts.min.js"></script>
+
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+<link href="/css/layui.css" rel="stylesheet" type="text/css">  
+<link href="/css/base.css" rel="stylesheet" type="text/css">  
+
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script type="text/javascript">
+   
+</script>
+
+</head>
+
+<body style="margin: 13px;" onload="tongjiRes()">
+
+<div id="tutu" style="width: 1118px;height:500px;" ></div>
+  
+
+
+<script type="text/javascript">
+
+		var xDataArr=[];
+		var yDataArr=[];
+
+		var option = {
+			title: {
+			   
+			}, 
+
+			xAxis: {
+			    type: 'category',//类目轴	
+                data: xDataArr,
+                axisLabel: {
+                    rotate: 35// 旋转角度
+                  }
+			},
+
+			yAxis: {
+				type: 'value',//数值抽
+				data:'', //在下面series设置数值
+			},
+
+			series: [
+				{
+					name: '',
+					type: 'bar',
+					data: yDataArr,
+					barWidth: '50%',//柱子宽度
+					label:{
+                       show:true,//显示数值
+					},
+					
+				},
+			],
+
+			tooltip: {
+                trigger: 'item',//鼠标放在柱子上提示
+			},
+		
+		};
+		
+
+		function tongjiRes()
+		{
+			axios({
+						method: 'POST',
+						url: '/xiaoliangTongji',
+						params:{
+							//zt:document.getElementById("zt").value,
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								xDataArr.length=0;//先清空
+								yDataArr.length=0;//先清空
+								
+								let list=data.data.data;
+								
+
+								for(let i=0;i<list.length;i++)
+								{
+									xDataArr.push(list[i].title);
+                                    yDataArr.push(list[i].xiaoliang);
+								} 
+								
+								
+								var myChart = echarts.init(document.getElementById('tutu'));
+		                        myChart.setOption(option);
+								
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+		}
+
+		
+</script>
+
+
+<style>
+    .el-pagination{
+		text-align: right;
+		padding-top: 20px;
+	}
+</style>
+
+</body>
+</html>

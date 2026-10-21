@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>管理员登录 | 校园体育用品</title>
+
+    <link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+    <script type="text/javascript" src="/js/vue.min.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body class="console-login">
+
+    <div id="adminLogin">
+        <section class="console-auth">
+            <div class="console-auth__brand">
+                <div class="console-auth__brand-inner">
+                    <a class="console-brand" href="/index.html">
+                        <span class="console-brand__mark" aria-hidden="true">
+                            <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <circle cx="24" cy="24" r="17" stroke="#111827" stroke-width="2.4"/>
+                                <path d="M7 24h34M24 7v34" stroke="#111827" stroke-width="1.8"/>
+                                <path d="M11 12c8 6 8 18 0 24M37 12c-8 6-8 18 0 24" stroke="#111827" stroke-width="1.8"/>
+                                <path d="M31 7l7 5-1 8" stroke="#ff6b3d" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <span class="console-brand__copy">
+                            <strong>校园体育用品</strong>
+                            <small>CAMPUS SPORTS STORE</small>
+                        </span>
+                    </a>
+
+                    <h2>每一次登录<br>都是新的<em>开场</em></h2>
+                    <p>管理商品、订单与校园运动资讯，让每一件装备更快抵达热爱运动的同学手中。</p>
+
+                    <div class="console-auth__brand-tags">
+                        <span>球类装备</span>
+                        <span>训练服饰</span>
+                        <span>校园赛事</span>
+                    </div>
+
+                    <div class="console-auth__court" aria-hidden="true"></div>
+                </div>
+            </div>
+
+            <div class="console-auth__panel">
+                <form class="console-auth__form" action="./admin/index.html" name="form1">
+                    <span class="console-auth__kicker">ADMIN CONSOLE</span>
+                    <h1>管理员登录</h1>
+                    <p>进入校园体育用品管理后台，开始今天的赛场调度。</p>
+
+                    <div class="console-auth__field">
+                        <label for="adminUsername">管理员账号</label>
+                        <input id="adminUsername" type="text" class="user" v-model.trim="username" autocomplete="username" required>
+                    </div>
+
+                    <div class="console-auth__field">
+                        <label for="adminPassword">登录密码</label>
+                        <input id="adminPassword" type="password" class="pwd" v-model.trim="password" autocomplete="current-password" required>
+                    </div>
+
+                    <input type="button" @click="userLogin()" value="进入管理后台" class="console-auth__submit"/>
+
+                    <div class="console-auth__hint">
+                        <b>演示账号：</b>a / a　·　如遇登录异常，请联系系统维护人员。
+                    </div>
+
+                    <a class="console-auth__back" href="/index.html">← 返回前台商城</a>
+                </form>
+            </div>
+        </section>
+    </div>
+
+</body>
+
+<script type="text/javascript">
+    var vm = new Vue({
+        el: '#adminLogin',
+        data: {
+            username: "",
+            password: "",
+        },
+        methods: {
+            userLogin() {
+                if (this.username == "") {
+                    alert("请输入账号");
+                    return;
+                }
+                if (this.password == "") {
+                    alert("请输入密码");
+                    return;
+                }
+                axios({
+                    method: 'POST',
+                    url: '/adminLogin',
+                    params: {
+                        username: this.username,
+                        password: this.password,
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        alert("登录成功");
+                        var admin = data.data.data;
+                        sessionStorage.setItem("admin", JSON.stringify(admin));
+
+                        location.href = "/admin/index.html";
+                    }
+                    if (data.data.state == 45) {
+                        alert("账号错误");
+                    }
+                    if (data.data.state == 46) {
+                        alert("密码错误");
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            }
+        }
+    })
+</script>
+
+</html>

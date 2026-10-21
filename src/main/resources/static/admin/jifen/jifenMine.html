@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="/css/base.css" />
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/layer/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/layer/layer.js"></script>
+
+</head>
+<body style="margin: 13px;">
+			<div id="mimaDiv">
+				     <table width="100%"  border="0" cellpadding="8" cellspacing="1" bgcolor="#CBD8AC">
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                积分：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model.trim="jifen.fen" style="width: 288px;" readonly="readonly"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" height="30">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                &nbsp;
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                            &nbsp;<input type="button" value="兑换礼品" @click="duihuanAdd()" style="width: 123px;"/>&nbsp; 
+                                            </td>
+                                        </tr>
+                     </table> 
+                     
+			</div>
+			
+			
+			
+			
+	<script src="/js/vue.min.js"></script>	
+	<script type="text/javascript" src="/js/axios.min.js"></script>	
+
+	<script type="text/javascript">
+		var vm = new Vue({
+			
+			el: '#mimaDiv',
+			data: 
+			{
+				jifen:{
+				  
+                },
+                dialogFormVisible:false,
+			},
+			methods: 
+			{
+				jifenMine()
+				{
+					axios({
+							method: 'POST',
+							url: '/jifenMine',
+							//data: this.user,
+							/* params:{
+								username:this.user.userName,
+								password:this.user.userPw,
+							} */
+							}).then(data => {
+								if (data.data.state == 66)
+								{
+									this.jifen=data.data.data;
+								} 
+								if (data.data.state == 200)
+								{
+									alert("session失效，请重新登录");
+								} 
+								
+							}).catch(error => {
+								alert(error);
+							})
+				},
+				
+				duihuanAdd()
+				{
+					var url = "/admin/duihuan/duihuanAdd.html?jifenMy="+this.jifen.fen;
+	                /* layer.open({
+	                    content: url,
+	                    type: 2,
+	                    title: '&nbsp;',
+	                    shadeClose: true,
+	                    shade: false,
+	                    maxmin: false, //开启最大化最小化按钮
+	                    area: ['850px', '430px'],
+	                    cancel:function aa(layero, index) {},
+
+	                    }); */
+	                window.location.href=url;
+				}
+			
+			},
+
+			created()
+            {
+                this.jifenMine();
+            },
+		
+		})
+	</script>
+
+   </body>
+</html>

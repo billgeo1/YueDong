@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="/css/base.css" />
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+
+</head>
+<body style="margin: 13px;">
+			<div id="mimaDiv">
+				     <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#F5F5F5" style="margin-bottom:8px">
+						
+						<tr bgcolor="#FFFFFF" style="height: 65px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						       原密码：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="password" v-model.trim="oldPass" size="40"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        新密码：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="password" v-model.trim="newPass" size="40"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="10" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+							   <input type="button" value="提交" @click="mimaGai()"
+							   class="lanse" style="width: 86px;"/>&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+			</div>
+			
+			
+			
+			
+	<script src="/js/vue.min.js"></script>	
+	<script type="text/javascript" src="/js/axios.min.js"></script>	
+
+	<script type="text/javascript">
+		var vm = new Vue({
+			
+			el: '#mimaDiv',
+			data: 
+			{
+				oldPass: "",
+				newPass: "",
+			},
+			methods: 
+			{
+				mimaGai()
+				{
+					if(this.oldPass =="")
+					{
+						alert("请输入原密码");return false;
+					}
+					if(this.newPass =="")
+					{
+						alert("请输入新密码");return false;
+					}
+					this.adminPassUpdate();
+				},
+
+                adminPassUpdate()
+				{
+					axios({
+							method: 'POST',
+							url: '/adminPassUpdate',
+							params:{
+								oldPass:this.oldPass,
+								newPass:this.newPass,
+							}
+							}).then(data => {
+								if (data.data.state == 66)
+								{
+									alert("修改成功,重新登录后生效");
+								} 
+								if (data.data.state == 46)
+								{
+									alert("原密码错误");
+								}
+							}).catch(error => {
+								alert(error);
+						})
+					
+				}
+			}
+		
+		})
+	</script>
+
+   </body>
+</html>

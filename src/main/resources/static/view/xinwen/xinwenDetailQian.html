@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育运动资讯详情，阅读校园训练、赛事与体育装备相关内容。">
+    <meta name="author" content="跃动体育">
+
+    <title>运动资讯详情｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <a href="/view/xinwen/xinwenAll.html">运动资讯</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>文章详情</span>
+                </div>
+                <span class="sports-page-hero__kicker">Campus Sports Journal</span>
+                <h1>{{xinwen.biaoti || '运动资讯详情'}}</h1>
+                <p>从训练场到校园赛场，找到属于你的运动节奏。</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="article-layout">
+                    <article class="article-card">
+                        <img v-if="xinwen.fujian"
+                             class="article-cover"
+                             :src="xinwen.fujian"
+                             @error="useFallbackImage"
+                             :alt="xinwen.biaoti">
+                        <div class="article-body">
+                            <div class="article-meta">
+                                <span><i class="bi bi-calendar3"></i> {{xinwen.shijian || '发布时间待更新'}}</span>
+                                <span><i class="bi bi-mortarboard"></i> 校园运动编辑部</span>
+                                <span><i class="bi bi-lightning-charge"></i> 训练与装备</span>
+                            </div>
+                            <div v-html="xinwen.neirong"></div>
+                            <div class="article-end">
+                                <span>PLAY HARD · STAY SHARP</span>
+                                <a href="/view/xinwen/xinwenAll.html"><i class="bi bi-arrow-left"></i> 返回资讯列表</a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <aside class="article-side">
+                        <div class="article-side__card">
+                            <h3>继续阅读</h3>
+                            <a href="/view/xinwen/xinwenAll.html">
+                                <span><i class="bi bi-newspaper me-2"></i>全部运动资讯</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <a href="/view/gonggao/gonggaoAll.html">
+                                <span><i class="bi bi-megaphone me-2"></i>系统公告</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                            <a href="/view/liuyanban/liuyanbanAll.html">
+                                <span><i class="bi bi-chat-dots me-2"></i>运动社区</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="article-side__cta">
+                            <i class="bi bi-bag-check"></i>
+                            <h3>装备就位，状态全开</h3>
+                            <p>从篮球、足球到网球与羽毛球，为你的下一场训练挑一件趁手装备。</p>
+                            <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">
+                                去逛装备 <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            xinwen: {}
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/xinwenDetailQian',
+                    params: {
+                        id: getUrlParam('id')
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.xinwen = data.data.data;
+                        if (this.xinwen.biaoti)
+                        {
+                            document.title = this.xinwen.biaoti + "｜跃动体育";
+                        }
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            useFallbackImage(event)
+            {
+                event.target.style.display = "none";
+            },
+
+            down(url)
+            {
+                window.location.href = "/down?url=" + url;
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

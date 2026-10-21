@@ -1,0 +1,277 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="跃动体育校园运动社区，分享大学生训练心得、装备体验、赛事应援与运动生活故事。">
+    <meta name="author" content="跃动体育">
+
+    <title>运动社区｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__ball" aria-hidden="true"></span>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>运动社区</span>
+                </div>
+                <span class="sports-page-hero__kicker">Campus Sports Community / 校园运动社区</span>
+                <h1>把你的运动故事留在这里</h1>
+                <p>训练心得、装备体验、赛事应援和约球信息，都可以在这里找到同频的运动伙伴。</p>
+                <div class="hero-tags">
+                    <span><i class="bi bi-chat-dots"></i> 分享交流</span>
+                    <span><i class="bi bi-people"></i> 找到队友</span>
+                    <span><i class="bi bi-lightning-charge"></i> 一起上场</span>
+                </div>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="shop-toolbar">
+                    <div>
+                        <span class="sports-eyebrow">Team Talk</span>
+                        <h2>运动社区留言</h2>
+                        <p>真实分享，友好交流，让每一次训练更有动力</p>
+                    </div>
+                    <span class="result-count"><i class="bi bi-chat-square-heart-fill"></i> 共 {{total}} 条</span>
+                </div>
+
+                <div class="community-layout">
+                    <div>
+                        <div class="community-feed">
+                            <div class="community-feed__head">
+                                <div>
+                                    <span class="sports-eyebrow">Latest Messages</span>
+                                    <h2>最新留言</h2>
+                                </div>
+                                <span>校园运动伙伴的实时分享</span>
+                            </div>
+
+                            <template v-if="liuyanbanList.length">
+                                <article class="message-card"
+                                         v-for="(liuyanban, index) in liuyanbanList"
+                                         :key="liuyanban.id">
+                                    <span class="message-avatar"><i class="bi bi-person-fill"></i></span>
+                                    <div>
+                                        <div class="message-card__top">
+                                            <span class="message-card__name">校园运动伙伴</span>
+                                            <span class="message-card__time">{{liuyanban.liuyanshi}}</span>
+                                        </div>
+                                        <p class="message-card__content">{{liuyanban.neirong}}</p>
+
+                                        <div class="message-reply" v-if="liuyanban.huifu">
+                                            <div class="message-reply__head">
+                                                <strong><i class="bi bi-patch-check-fill"></i> 官方回复</strong>
+                                                <time v-if="liuyanban.huifushi">{{liuyanban.huifushi}}</time>
+                                            </div>
+                                            <div>{{liuyanban.huifu}}</div>
+                                        </div>
+                                    </div>
+                                </article>
+                            </template>
+
+                            <div class="empty-state" v-else>
+                                <i class="bi bi-chat-square-dots"></i>
+                                <strong>还没有人发言</strong>
+                                来写下第一条校园运动留言吧
+                            </div>
+                        </div>
+
+                        <form class="message-form" @submit.prevent="liuyanbanAdd()">
+                            <span class="sports-eyebrow">Leave a Message</span>
+                            <h2>说说你的运动故事</h2>
+                            <p>训练心得、装备体验、赛事应援，都欢迎留在这里。</p>
+                            <div class="message-form__field">
+                                <textarea rows="5"
+                                          maxlength="200"
+                                          v-model="liuyanban.neirong"
+                                          placeholder="例如：今天第一次打满全场，想和大家聊聊这双球鞋的实战感受……"></textarea>
+                                <i class="bi bi-pencil"></i>
+                            </div>
+                            <div class="message-form__actions">
+                                <span class="message-form__count">{{liuyanban.neirong.length}} / 200</span>
+                                <button type="submit" class="sports-btn sports-btn--lime">
+                                    发布留言 <i class="bi bi-send"></i>
+                                </button>
+                            </div>
+                            <div class="message-form__hint">
+                                <i class="bi bi-info-circle"></i>
+                                {{isLoggedIn ? '留言会自动记录当前时间，请友善交流。' : '当前为游客模式，登录后即可发布留言。'}}
+                            </div>
+                        </form>
+                    </div>
+
+                    <aside class="community-side">
+                        <div class="community-rule">
+                            <h3>社区公约</h3>
+                            <p><i class="bi bi-check2-circle"></i> 分享真实的训练与装备体验</p>
+                            <p><i class="bi bi-check2-circle"></i> 尊重不同项目与不同水平的伙伴</p>
+                            <p><i class="bi bi-check2-circle"></i> 不发布广告、攻击性或无关内容</p>
+                            <p><i class="bi bi-check2-circle"></i> 约球请写清时间、场地与项目</p>
+                        </div>
+
+                        <div class="article-side__cta">
+                            <i class="bi bi-bag-check"></i>
+                            <h3>装备到位，约球更尽兴</h3>
+                            <p>从篮球、足球到网球与羽毛球，为下一次校园约球准备好趁手装备。</p>
+                            <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">
+                                去逛装备 <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </aside>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    new Vue({
+        el: '#app',
+        data: {
+            total: 0,
+            isLoggedIn: false,
+            liuyanbanList: [],
+            liuyanban: {
+                id: "",
+                user_id: "",
+                neirong: "",
+                liuyanshi: "",
+                huifu: "",
+                huifushi: ""
+            }
+        },
+
+        methods: {
+            getData()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/liuyanbanAll',
+                    params: {
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        this.liuyanbanList = data.data.data || [];
+                        this.total = this.liuyanbanList.length;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            liuyanbanAdd()
+            {
+                var userJsonString = sessionStorage.getItem("user");
+                if (userJsonString == null)
+                {
+                    alert("请先登录");
+                    return false;
+                }
+                if (!this.liuyanban.neirong.trim())
+                {
+                    alert("请输入留言内容");
+                    return false;
+                }
+
+                this.liuyanban.liuyanshi = this.formateDate(new Date(), 'yyyy-MM-dd hh:mm');
+                this.add();
+            },
+
+            add()
+            {
+                axios({
+                    method: 'POST',
+                    url: '/liuyanbanAdd',
+                    data: this.liuyanban
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        alert("留言成功");
+                        window.location.reload();
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            padLeftZero(str)
+            {
+                return ('00' + str).substr(str.length);
+            },
+
+            formateDate(date, fmt)
+            {
+                if (/(y+)/.test(fmt))
+                {
+                    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+                }
+                let o = {
+                    'M+': date.getMonth() + 1,
+                    'd+': date.getDate(),
+                    'h+': date.getHours(),
+                    'm+': date.getMinutes(),
+                    's+': date.getSeconds()
+                };
+                for (let k in o)
+                {
+                    if (new RegExp(`(${k})`).test(fmt))
+                    {
+                        let str = o[k] + '';
+                        fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : this.padLeftZero(str));
+                    }
+                }
+                return fmt;
+            },
+
+            down(url)
+            {
+                window.location.href = "/down?url=" + url;
+            }
+        },
+
+        created()
+        {
+            this.getData();
+            this.liuyanban.liuyanshi = this.formateDate(new Date(), 'yyyy-MM-dd hh:mm');
+
+            var userJsonString = sessionStorage.getItem("user");
+            if (userJsonString != null)
+            {
+                var user = JSON.parse(userJsonString);
+                this.liuyanban.user_id = user.uid;
+                this.isLoggedIn = true;
+            }
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

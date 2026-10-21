@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+<link rel="stylesheet" type="text/css" href="/css/base.css" />
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+<script src="/js/vue.min.js"></script>
+<script src="/js/axios.min.js"></script>
+
+        
+        
+        
+</head>
+<body style="margin: 13px;">
+      <div id="addressDiv">
+				     <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#CBD8AC" style="margin-bottom:8px">
+						
+						<tr bgcolor="#FFFFFF" style="height: 45px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        收货人：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="xingming" v-model="address.xingming" size="36"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 45px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        详细地址：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="dizhi" v-model="address.dizhi" size="56"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 45px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        电话：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="dianhua" v-model="address.dianhua" size="36"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 35px;">
+						    <td width="10" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="addressAdd()" class="button blue" />&nbsp; 
+						       <input type="reset" value="重置" class="button blue"/>&nbsp;
+						    </td>
+						</tr>
+					 </table>
+        </div>
+   </body>
+   
+
+   <script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#addressDiv',
+		data: 
+		{
+			address:{
+				id:'',
+                userId:'',
+                xingming:'',
+                dizhi:'',
+                
+                dianhua:'',              
+			},
+
+		},
+		methods: 
+		{
+			addressAdd()
+			{
+				if(this.address.xingming =="")
+				{
+					alert("请输入姓名");return false;
+                } 
+                if(this.address.dizhi =="")
+				{
+					alert("请输入地址");return false;
+                } 
+                if(this.address.dianhua =="")
+				{
+					alert("请输入电话");return false;
+				} 
+				
+				axios({
+						method: 'POST',
+						url: '/addressAdd',
+						data: this.address,
+						/* params:{
+							username:this.address.userName,
+							password:this.address.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("添加成功");
+								location.href="/admin/address/addressMine.html";
+							} 
+						    
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+
+			
+		},
+
+		created()
+		{
+                var userJsonString = sessionStorage.getItem("user");
+                if(userJsonString !=null)
+                {
+                    var user=JSON.parse(userJsonString);
+                    this.address.userId=user.uid;
+                }
+                else
+                {
+                
+                }
+		}
+	
+	    
+	})
+</script>
+</html>

@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+
+<script src="/js/vue.min.js"></script>
+
+<script src="/elementui/index.js"></script>
+<link href="/elementui/index.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+<link href="/css/layui.css" rel="stylesheet" type="text/css">  
+<link href="/css/base.css" rel="stylesheet" type="text/css">  
+
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script type="text/javascript" src="/layer/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/layer/layer.js"></script>
+
+</head>
+
+<body style="margin: 13px;">
+  <div id="loginDiv">
+	<template>
+	</template>
+	<table class="layui-table">
+    <thead>
+      <tr>
+		<th>序号</th>
+		<!-- <th>userId</th> -->
+		<th>订单号</th>
+		<th>下单时间</th>
+		
+		<th>送货地址</th>
+		<th>总金额</th>
+		<th>付款状态</th>
+		<th>方式</th>
+
+		<th>状态</th>
+		<th>操作</th>
+      </tr> 
+    </thead>
+    <tbody>
+      <tr v-for="(order, index) in xianshilist" :key="order.id">
+		<td>{{index+1}}</td>
+		<!-- <td>{{order.userId}}</td> -->
+		<td>{{order.bianhao}}</td>
+		<td>{{order.xiadanshi}}</td>
+
+		<td>{{order.dizhi}}</td>
+		<td>{{order.zongjine}}</td>
+		<td>{{order.fkzt}}</td>
+		<td>{{order.fkfs}}</td>
+
+		<td>{{order.zt}}</td>
+		<td>
+			<input type="button" value="删除" class="hongse" @click="del(order.id)" style="width: 66px;"/>
+			<input type="button" value="明细" class="lanse" @click="mingxi(order.id)" style="width: 66px;"/>
+	    </td>
+      </tr>
+    </tbody>
+    </table>
+
+	<el-pagination background 
+		 layout="total, prev, pager, next" 
+		 :total="total" 
+		 :page-size="pageSize"
+		 :current-page="currentPage" 
+		 @current-change="handleCurrentChange">
+	</el-pagination>
+
+
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#loginDiv',
+		data: 
+		{
+			total:0,
+			pageSize:5,
+			currentPage:1,//当前页
+
+			orderList:[],
+			xianshilist: null,	
+
+			dialogorderEdit:false,
+			order:{
+				
+			},
+
+		},
+		methods: 
+		{
+			getData()
+			{
+               axios({
+						method: 'POST',
+						url: '/orderMine',
+						params:{
+							
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.orderList=data.data.data;
+								this.total=this.orderList.length;
+	                            this.xianshilist = this.orderList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+			
+			handleCurrentChange(currentPage)//用户点的页码
+			{
+				var _this = this;
+				if (_this.orderList) 
+				{
+				   if (currentPage)
+				   {
+                      _this.currentPage = currentPage;
+                   }
+                   _this.xianshilist = _this.orderList.slice((_this.currentPage - 1) * _this.pageSize,_this.currentPage * _this.pageSize);
+                } else {}
+
+			},
+
+			
+
+			
+			del(id)
+			{
+				if(confirm('您确定删除吗？'))
+				{
+					axios({
+						method: 'POST',
+						url: '/orderDel',
+						//data: this.order,
+						params:{
+							id:id,
+						} 
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("删除成功");
+								this.currentPage=1;
+								this.getData();
+							}  
+							
+						}).catch(error => {
+							alert(error);
+					})
+				}
+			},
+
+
+			mingxi(id)
+            {
+                var url = "/admin/orderItem/orderMingxi.html?orderId="+id;
+                layer.open({
+                    content: url,
+                    type: 2,
+                    title: '&nbsp;',
+                    shadeClose: true,
+                    shade: false,
+                    maxmin: false, //开启最大化最小化按钮
+                    area: ['750px', '330px'],
+                    cancel:function aa(layero, index) {},
+
+                    });
+            },
+
+
+		},
+		created()
+		{
+			this.getData();
+		}
+
+	
+	    
+	})
+</script>
+
+
+<style>
+    .el-pagination{
+		text-align: right;
+		padding-top: 20px;
+	}
+</style>
+
+</body>
+</html>

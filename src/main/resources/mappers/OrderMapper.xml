@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.OrderMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_order
+       (
+            userId,
+            bianhao,
+			xiadanshi,
+			
+			dizhi,
+			zongjine,
+			fkzt,
+			fkfs,
+			
+			zt
+       ) 
+       values 
+       (
+            #{userId},
+            #{bianhao},
+			#{xiadanshi},
+			
+			#{dizhi},
+			#{zongjine},
+			#{fkzt},
+			#{fkfs},
+			
+			#{zt}
+       )
+   </insert>
+   
+   
+   <delete id="delete">
+       delete from t_order where id=#{id}
+   </delete>
+   
+	   
+   
+   <update id="updateZt">
+       update t_order set 
+            zt=#{zt}
+            where id= #{id}
+   </update>
+   
+   
+ 
+   <select id="select" resultType="com.xiangmu.pojo.Order">
+      select * from t_order where bianhao like "%" #{bianhao} "%" 
+        and xiadanshi like "%" #{xiadanshi} "%" 
+        and dizhi like "%" #{xingming} "%" 
+        order by id desc;
+   </select>
+   
+ 
+   <select id="findById" resultType="com.xiangmu.pojo.Order">
+      select * from t_order where id =#{id}
+   </select>
+   
+   
+   
+   <select id="selectByUserId" resultType="com.xiangmu.pojo.Order">
+      select * from t_order where userId=#{userId} order by id desc;
+   </select>
+   
+</mapper>
+
+  
+  

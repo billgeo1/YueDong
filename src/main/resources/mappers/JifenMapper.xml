@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.JifenMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_jifen(
+			userId,
+			fen
+       ) values 
+       (
+            #{userId},
+			#{fen}
+       )
+   </insert>
+   
+   <update id="update">
+       update t_jifen set 
+            fen=#{fen}
+            where userId= #{userId}
+   </update>
+   
+   
+      
+   
+   <select id="selectByUserId" resultType="com.xiangmu.pojo.Jifen">
+      select * from t_jifen where userId =#{userId}
+   </select>
+   
+   
+   
+   <select id="findById" resultType="com.xiangmu.pojo.Jifen">
+      select * from t_jifen where id =#{id}
+   </select>
+   
+   
+   
+   
+   
+   
+   
+   
+</mapper>
+
+  
+  

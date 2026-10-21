@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.CartMapper">
+  
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_cart(
+            <!-- id -->
+            userId,
+			productId,
+			shuliang
+       ) values 
+       (
+            <!--  #{id}, -->
+            #{userId},
+			#{productId},
+			#{shuliang}
+       )
+   </insert>
+   
+   
+   <delete id="del">
+       delete from t_cart where id=#{id}
+   </delete>
+   
+   
+   
+   <delete id="delAllByUser">
+       delete from t_cart where userId=#{userId}
+   </delete>
+   
+   
+   <update id="upDate">
+       update t_cart set shuliang= #{shuliang} where id=#{id}
+   </update>
+   
+   
+   
+   <select id="selectByUserAndProduct" resultType="com.xiangmu.pojo.Cart">
+       select * from t_cart where userId=#{userId} and productId=#{productId}
+   </select>
+   
+   
+   <select id="selectCartByUser" resultType="com.xiangmu.pojo.Cart">
+       select * from t_cart where userId=#{userId} 
+   </select>
+</mapper>
+
+  
+  

@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.ShoucangMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_shoucang
+       (
+            userId,
+			productId,
+			shijian
+       ) 
+       values 
+       (
+            #{userId},
+			#{productId},
+			#{shijian}
+       )
+   </insert>
+   
+   
+   
+   
+   
+   <delete id="delete">
+       delete from t_shoucang where id=#{id}
+   </delete>
+   
+   
+    
+   
+   
+   <select id="select" resultType="com.xiangmu.pojo.Shoucang">
+      select * from t_shoucang where userId=#{userId}
+   </select>
+   
+   
+   <select id="selectByUserAndPro" resultType="com.xiangmu.pojo.Shoucang">
+      select * from t_shoucang where userId=#{userId} and productId=#{productId}
+   </select>
+   
+   
+   
+   <select id="findById" resultType="com.xiangmu.pojo.Shoucang">
+      select * from t_shoucang where id =#{id}
+   </select>
+   
+</mapper>
+
+  
+  

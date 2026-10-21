@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+
+<script src="/js/vue.min.js"></script>
+
+<script src="/elementui/index.js"></script>
+<link href="/elementui/index.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+<link href="/css/layui.css" rel="stylesheet" type="text/css">  
+<link href="/css/base.css" rel="stylesheet" type="text/css">  
+
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+<script src="/ckeditor/ckeditor.js"></script>
+</head>
+
+<body style="margin: 13px;">
+  <div id="loginDiv">
+	<template>
+		<span style="margin-left: 8px;">信息标题：</span>
+		<input type="text" v-model.trim="biaoti" size="17"/>
+		<input type="button" value="查询" @click="xinwenRes()" class="lanse" style="width: 86px;"/>
+	</template>
+	<table class="layui-table">
+    <thead>
+      <tr>
+		<th>序号</th>
+        <th>信息标题</th>
+        <!-- <th>内容</th> -->
+		<th>图片</th>
+		
+		<th>发布时间</th>
+		<th>操作</th>
+      </tr> 
+    </thead>
+    <tbody>
+      <tr v-for="(xinwen, index) in xianshilist" :key="xinwen.id">
+        <td>{{index+1}}</td>
+        <td>{{xinwen.biaoti}}</td>
+		<!-- <td>{{xinwen.neirong}}</td> -->
+		<td style="width: 13%;">
+			<img :src= "xinwen.fujian" />
+		</td>
+		
+
+		<td>{{xinwen.shijian}}</td>
+		<td>
+			<input type="button" value="编辑" class="lvse" @click="edit(xinwen)" style="width: 66px;"/>
+			<input type="button" value="删除" class="hongse" @click="del(xinwen.id)" style="width: 66px;"/>
+	    </td>
+      </tr>
+    </tbody>
+    </table>
+
+	<el-pagination background 
+		 layout="total, prev, pager, next" 
+		 :total="total" 
+		 :page-size="pageSize"
+		 :current-page="currentPage" 
+		 @current-change="handleCurrentChange">
+	</el-pagination>
+	
+	<input type="button" value="发布新闻" class="lanse" onclick="xinwenAdd()" style="width: 99px;"/>
+
+    <el-dialog title="编辑" :visible.sync="dialogFormVisible" width="80%">
+	<table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#F5F5F5" style="margin-bottom:8px">
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        信息标题：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" v-model.trim="xinwen.biaoti" size="55"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        信息内容：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <textarea class="ckeditor" name="neirong" v-model.trim="xinwen.neirong" cols="80" rows="8"></textarea>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          附件上传：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+								<input type="text" size="60" readonly="readonly" v-model="xinwen.fujian"/><br/>
+						        <input type="file" ref="fileRef" accept="*" @change="handleFileChange($event)"/>
+								<input type="button" value="上传" style="width: 66px;" @click="upload()"/>
+								<input type="hidden" size="60" readonly="readonly" v-model="xinwen.fujianYuan"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          提交时间：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" v-model="xinwen.shijian" size="35" />
+						    </td>
+						</tr>
+						
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="xinwenUpdate()" class="lanse" style="width: 86px;"/>&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+	</el-dialog>
+  </div>
+  
+
+
+<script type="text/javascript">
+    function xinwenAdd()
+	{
+		var url="../xinwen/xinwenAdd.html";
+		window.location.href=url;
+	}
+
+	var vm = new Vue({
+		
+		el: '#loginDiv',
+		data: 
+		{
+			total:0,
+			pageSize:2,
+			currentPage:1,//当前页
+
+			xinwenList:[],
+			xianshilist: null,	
+
+			dialogFormVisible:false,
+			xinwen:{
+				
+			},
+			file:"",
+			biaoti:"",
+		},
+		methods: 
+		{
+			getData()
+			{
+               axios({
+						method: 'POST',
+						url: '/xinwenMana',
+						params:{
+							
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.xinwenList=data.data.data;
+								this.total=this.xinwenList.length;
+								
+	                            this.xianshilist = this.xinwenList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+			
+			handleCurrentChange(currentPage)//用户点的页码
+			{
+				var _this = this;
+				if (_this.xinwenList) 
+				{
+				   if (currentPage)
+				   {
+                      _this.currentPage = currentPage;
+                   }
+                   _this.xianshilist = _this.xinwenList.slice((_this.currentPage - 1) * _this.pageSize,_this.currentPage * _this.pageSize);
+                } else {}
+
+			},
+
+			
+			edit(xinwen)
+			{
+				this.xinwen={...xinwen};
+				this.dialogFormVisible=true;
+			},
+
+			xinwenUpdate()
+			{
+				if(this.xinwen.biaoti=="")
+				{
+					alert("请输入信息标题");
+					return false;
+				}
+
+				axios({
+						method: 'POST',
+						url: '/xinwenUpdate',
+						data: this.xinwen,
+						/* params:{
+							username:this.xinwen.userName,
+							password:this.xinwen.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("修改成功");
+								
+								this.dialogFormVisible=false;
+								this.getData();
+							}  
+						    
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+			del(id)
+			{
+				if(confirm('您确定删除吗？'))
+				{
+					axios({
+						method: 'POST',
+						url: '/xinwenDel',
+						//data: this.fang,
+						params:{
+							id:id,
+						} 
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("删除成功");
+								this.currentPage=1;
+								this.getData();
+							}  
+							
+						}).catch(error => {
+							alert(error);
+					})
+				}
+			},
+
+			down(url)
+			{
+				window.location.href="/down?url="+url;
+			},
+
+			handleFileChange(event) 
+			{
+				this.file = event.target.files[0];
+			},
+
+			upload()
+			{
+				/* if(this.$refs.fileRef.value=="") */
+				if(this.file=="")
+				{
+					alert("请选择文件");
+					return false;
+				}
+
+				let formFile = new FormData();
+				formFile.append("file", this.file);
+				
+                axios({
+						method: 'POST',
+						url: '/upload',
+						data: formFile, 
+						/* params:{
+							username:this.xinwen.userName,
+							password:this.xinwen.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("上传成功");
+								this.file='';
+								var fujian=data.data.data; 
+								this.xinwen.fujian=fujian.fujian;
+								this.xinwen.fujianYuan=fujian.fujianYuan;
+							} 
+						}).catch(error => {
+							alert(error);
+				})
+
+
+			},
+
+			xinwenRes()
+			{
+               axios({
+						method: 'POST',
+						url: '/xinwenRes',
+						params:{
+							biaoti:this.biaoti,
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.xinwenList=data.data.data;
+								this.total=this.xinwenList.length;
+								this.currentPage=1;
+	                            this.xianshilist = this.xinwenList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+
+		},
+		created()
+		{
+			this.getData();
+		},
+		
+	    
+	})
+</script>
+
+
+<style>
+    .el-pagination{
+		text-align: right;
+		padding-top: 20px;
+	}
+</style>
+
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>管理工作台 | 大学生体育用品网</title>
+    <link rel="stylesheet" href="/css/sports-console.css">
+</head>
+
+<body class="console-workbench">
+    <main class="wb">
+        <section class="wb-hero">
+            <div class="wb-hero__copy">
+                <span class="wb-kicker">CAMPUS SPORTS · MANAGEMENT HUB</span>
+                <h1>让每一件装备<br><em>准时上场。</em></h1>
+                <p>这里是大学生体育用品网站的管理工作台。维护商品与分类、处理订单、更新校园运动资讯，让前台展示始终保持活力与专业。</p>
+                <div class="wb-hero__actions">
+                    <a class="wb-btn wb-btn--lime" href="/admin/product/productMana.html">管理商品 <span>→</span></a>
+                    <a class="wb-btn wb-btn--ghost" href="/admin/order/orderMana.html">处理订单</a>
+                </div>
+                <div class="wb-hero__stats">
+                    <div class="wb-hero__stat"><strong>01</strong><span>商品与分类</span></div>
+                    <div class="wb-hero__stat"><strong>02</strong><span>订单与发货</span></div>
+                    <div class="wb-hero__stat"><strong>03</strong><span>内容与公告</span></div>
+                </div>
+            </div>
+
+            <div class="wb-hero__art" aria-hidden="true">
+                <div class="wb-hero__court"></div>
+                <span class="wb-hero__tag wb-hero__tag--one">NEW GEAR / 新品上架</span>
+                <div class="wb-ball">
+                    <span class="wb-ball__seam wb-ball__seam--a"></span>
+                    <span class="wb-ball__seam wb-ball__seam--b"></span>
+                </div>
+                <span class="wb-hero__tag wb-hero__tag--two">STOCK READY / 库存同步</span>
+            </div>
+        </section>
+
+        <section class="wb-grid" aria-label="常用管理入口">
+            <a class="wb-card" href="/admin/product/productMana.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M20.5 7.3 12 3 3.5 7.3v9.4L12 21l8.5-4.3z" />
+                        <path d="m3.8 7.4 8.2 4.2 8.2-4.2M12 11.6V21M7.8 5.1l8.3 4.2v4.1" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>商品信息管理</strong><span>维护装备标题、图片、价格与库存</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/order/orderMana.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M8 6h12l-1.4 8.5H9.2z" />
+                        <path d="M8 6 6.6 3H3M9.5 19.5a1 1 0 1 0 0-.1M18 19.5a1 1 0 1 0 0-.1" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>订单管理</strong><span>查看订单明细、发货与结算状态</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/user/userMana.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.4" />
+                        <path d="M5.2 20c.5-3.8 3.1-6 6.8-6s6.3 2.2 6.8 6" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>用户信息管理</strong><span>查询校园会员资料与账号状态</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/leibie/leibieMana.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <rect x="3.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="3.5" width="7" height="7" rx="1.6" />
+                        <rect x="3.5" y="13.5" width="7" height="7" rx="1.6" />
+                        <rect x="13.5" y="13.5" width="7" height="7" rx="1.6" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>类别维护</strong><span>整理球类、健身、户外等运动分类</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/xinwen/xinwenMana.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M5 3.5h11l3 3V20.5H5z" />
+                        <path d="M16 3.8v3.4h3M8 11h8M8 14.5h8M8 18h5" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>新闻动态</strong><span>发布校园赛事、运动知识与装备资讯</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/product/xiaoliang.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 20V10M10 20V4M16 20v-7M22 20H2" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>销售统计</strong><span>了解装备销量走势与热门商品</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+        </section>
+
+        <section class="wb-bottom">
+            <div class="wb-panel">
+                <div class="wb-panel__head">
+                    <strong>运营小贴士</strong>
+                    <span>QUICK GUIDE</span>
+                </div>
+                <div class="wb-tip"><b>1</b><span>上架商品时补齐清晰的装备图片、分类与库存，前台展示会更完整。</span></div>
+                <div class="wb-tip"><b>2</b><span>订单发货后及时更新状态，方便同学在个人运动中心查看进度。</span></div>
+                <div class="wb-tip"><b>3</b><span>新闻与公告保持简短有重点，适合校园运动场景的阅读节奏。</span></div>
+            </div>
+
+            <div class="wb-panel wb-panel--sport">
+                <div class="wb-panel__head">
+                    <strong>主场宣言</strong>
+                    <span>PLAY ON</span>
+                </div>
+                <p class="wb-quote">把热爱穿在身上，<br>把专业做到每一个细节。<br><em>下一场，继续上场。</em></p>
+                <div class="wb-sign">CAMPUS SPORTS SUPPLY · 2026</div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

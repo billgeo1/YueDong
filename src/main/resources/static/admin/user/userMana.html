@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+
+<script src="/js/vue.min.js"></script>
+
+<script src="/elementui/index.js"></script>
+<link href="/elementui/index.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+<link href="/css/layui.css" rel="stylesheet" type="text/css">  
+<link href="/css/base.css" rel="stylesheet" type="text/css">  
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+</head>
+
+<body style="margin: 13px;">
+  <div id="loginDiv">
+	<template>
+		账号：<input type="text" v-model.trim="username" size="17"/>
+		姓名：<input type="text" v-model.trim="xingming" size="17"/>
+		<input type="button" value="查询" @click="userRes()" class="lanse" style="width: 86px;"/>
+	</template>
+	<table class="layui-table">
+    <thead>
+      <tr>
+		<th>序号</th>
+		<th>账号</th>
+		<th>密码</th>
+		<th>姓名</th>
+		
+		<th>性别</th>
+		<th>年龄</th>
+		<th>地址</th>
+		<th>联系电话</th>
+
+		<th>邮箱</th>
+		<th>操作</th>
+      </tr> 
+    </thead>
+    <tbody>
+      <tr v-for="(user, index) in xianshilist" :key="user.id">
+		<td>{{index+1}}</td>
+		<td>{{user.username}}</td>
+		<td>{{user.password}}</td>
+		<td>{{user.xingming}}</td>
+		
+		<td>{{user.xingbie}}</td>
+		<td>{{user.nianling}}</td>
+		<td>{{user.dizhi}}</td>
+		<td>{{user.dianhua}}</td>
+
+		<td>{{user.youxiang}}</td>
+		<td>
+			<input type="button" value="编辑" class="lvse" @click="edit(user)" style="width: 66px;"/>
+			<input type="button" value="删除" class="hongse" @click="del(user.uid)" style="width: 66px;"/>
+	    </td>
+      </tr>
+    </tbody>
+    </table>
+
+	<el-pagination background 
+		 layout="total, prev, pager, next" 
+		 :total="total" 
+		 :page-size="pageSize"
+		 :current-page="currentPage" 
+		 @current-change="handleCurrentChange">
+	</el-pagination>
+	
+
+    <el-dialog title="编辑" :visible.sync="dialoguserEdit" width="60%">
+	<table width="100%"  border="0" cellpadding="8" cellspacing="1" bgcolor="#CBD8AC">
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                账号：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model.trim="user.username" style="width: 288px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                密码：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="password" v-model.trim="user.password"  style="width: 288px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                姓名：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model="user.xingming" style="width: 288px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                性别：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="radio" v-model="user.xingbie" value="男" style="border: 0px;"/>男
+                                                &nbsp;&nbsp;
+                                                &nbsp;<input type="radio" v-model="user.xingbie" value="女" style="border: 0px;"/>女
+                                                
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                年龄：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model="user.nianling" style="width: 288px;" 
+                                                onkeyup="value=value.replace(/[^\d]/g,'') " 
+                                                onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                住址：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model="user.dizhi" style="width: 388px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                电话：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model="user.dianhua" style="width: 288px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" style="height: 43px;">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                邮箱：
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                                &nbsp;<input type="text" v-model="user.youxiang" style="width: 288px;"/>
+                                            </td>
+                                        </tr>
+                                        <tr bgcolor="#FFFFFF" height="30">
+                                            <td width="65" bgcolor="#FFFFFF" align="right">
+                                                &nbsp;
+                                            </td>
+                                            <td bgcolor="#FFFFFF" align="left">
+                                            &nbsp;<input type="button" value="提交" @click="userUpdate()" style="width: 70px;"/>&nbsp; 
+                                            </td>
+                                        </tr>
+                                     </table>   
+	</el-dialog>
+	
+
+
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#loginDiv',
+		data: 
+		{
+			total:0,
+			pageSize:2,
+			currentPage:1,//当前页
+
+			userList:[],
+			xianshilist: null,	
+
+			dialoguserEdit:false,
+			user:{
+				
+			},
+
+			/* 查询用的 */
+			username:"",
+			xingming:"",
+			
+		},
+		methods: 
+		{
+			getData()
+			{
+               axios({
+						method: 'POST',
+						url: '/userMana',
+						params:{
+							
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.userList=data.data.data;
+								this.total=this.userList.length;
+								
+	                            this.xianshilist = this.userList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error);
+			    })
+			},
+			
+			handleCurrentChange(currentPage)//用户点的页码
+			{
+				var _this = this;
+				if (_this.userList) 
+				{
+				   if (currentPage)
+				   {
+                      _this.currentPage = currentPage;
+                   }
+                   _this.xianshilist = _this.userList.slice((_this.currentPage - 1) * _this.pageSize,_this.currentPage * _this.pageSize);
+                } else {}
+
+			},
+
+			
+			
+			edit(user)
+			{
+				this.user={...user};
+				this.dialoguserEdit=true;
+			},
+
+			userUpdate()
+			{
+				axios({
+						method: 'POST',
+						url: '/userUpdate',
+						data: this.user,
+						/* params:{
+							username:this.user.userName,
+							password:this.user.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("修改成功");
+								this.dialoguserEdit=false;
+								this.getData();
+							}  
+						    
+						}).catch(error => {
+							alert(error);
+						})
+			},
+			
+			del(uid)
+			{
+				if(confirm('您确定删除吗？'))
+				{
+					axios({
+						method: 'POST',
+						url: '/userDel',
+						//data: this.user,
+						params:{
+							uid:uid,
+						} 
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("删除成功");
+								this.currentPage=1;
+								this.getData();
+							}  
+							
+						}).catch(error => {
+							alert(error);
+					})
+				}
+			},
+
+			userRes()
+			{
+				axios({
+						method: 'POST',
+						url: '/userRes',
+
+						params:{
+							xingming:this.xingming,
+							username:this.username,
+						}
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.userList=data.data.data;
+								this.total=this.userList.length;
+								this.currentPage=1;
+	                            this.xianshilist = this.userList.slice((this.currentPage - 1) * this.pageSize, this.currentPage * this.pageSize)
+							} 
+						    
+						}).catch(error => {
+							alert(error); 
+					    
+				})
+				this.currentPage=1;
+			},
+			
+
+		},
+		created()
+		{
+			this.getData();
+		}
+
+	
+	    
+	})
+</script>
+
+
+<style>
+    .el-pagination{
+		text-align: right;
+		padding-top: 20px;
+	}
+</style>
+
+</body>
+</html>

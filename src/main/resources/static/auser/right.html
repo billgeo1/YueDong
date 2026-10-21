@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的运动主场 | 大学生体育用品网</title>
+    <link rel="stylesheet" href="/css/sports-console.css">
+</head>
+
+<body class="console-workbench">
+    <main class="wb">
+        <section class="wb-hero">
+            <div class="wb-hero__copy">
+                <span class="wb-kicker">MEMBER · CAMPUS SPORTS CLUB</span>
+                <h1>欢迎回来，<br><em>运动搭子。</em></h1>
+                <p>在这里查看订单、管理收货地址、兑换心仪礼品。训练与生活都要保持满格状态，下一场校园主场等你上场。</p>
+                <div class="wb-hero__actions">
+                    <a class="wb-btn wb-btn--lime" href="/admin/order/orderMine.html">查看我的订单 <span>→</span></a>
+                    <a class="wb-btn wb-btn--ghost" href="/admin/jifen/jifenMine.html">我的积分</a>
+                </div>
+                <div class="wb-hero__stats">
+                    <div class="wb-hero__stat"><strong>01</strong><span>挑选运动装备</span></div>
+                    <div class="wb-hero__stat"><strong>02</strong><span>跟踪订单进度</span></div>
+                    <div class="wb-hero__stat"><strong>03</strong><span>兑换运动好礼</span></div>
+                </div>
+            </div>
+
+            <div class="wb-hero__art" aria-hidden="true">
+                <div class="wb-hero__court"></div>
+                <span class="wb-hero__tag wb-hero__tag--one">POINTS CLUB / 积分兑换</span>
+                <div class="wb-ball">
+                    <span class="wb-ball__seam wb-ball__seam--a"></span>
+                    <span class="wb-ball__seam wb-ball__seam--b"></span>
+                </div>
+                <span class="wb-hero__tag wb-hero__tag--two">MY HOME COURT / 我的主场</span>
+            </div>
+        </section>
+
+        <section class="wb-member-strip" aria-label="会员快捷信息">
+            <a class="wb-member-stat" href="/admin/order/orderMine.html">
+                <small>MY ORDERS</small>
+                <strong>我的订单</strong>
+                <span>查看发货与结算进度</span>
+                <i></i>
+            </a>
+            <a class="wb-member-stat" href="/admin/jifen/jifenMine.html">
+                <small>SPORTS POINTS</small>
+                <strong>我的积分</strong>
+                <span>积分记录与礼品兑换</span>
+                <i></i>
+            </a>
+            <a class="wb-member-stat" href="/admin/address/addressMine.html">
+                <small>DELIVERY</small>
+                <strong>收货地址</strong>
+                <span>管理常用校园收货点</span>
+                <i></i>
+            </a>
+        </section>
+
+        <section class="wb-grid" aria-label="个人中心快捷入口">
+            <a class="wb-card" href="/admin/userInfo/userinfo.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <circle cx="12" cy="8" r="3.4" />
+                        <path d="M5.2 20c.5-3.8 3.1-6 6.8-6s6.3 2.2 6.8 6" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>我的信息</strong><span>查看并完善个人资料与账号信息</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/address/addressMine.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 21s6.2-5.2 6.2-10A6.2 6.2 0 0 0 5.8 11c0 4.8 6.2 10 6.2 10Z" />
+                        <circle cx="12" cy="10.6" r="2.1" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>地址列表</strong><span>查看已保存的宿舍与校园收货地址</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/address/addressAdd.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M12 5v14M5 12h14" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>添加收货地址</strong><span>新增常用地址，下单收货更省心</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+
+            <a class="wb-card" href="/admin/duihuan/duihuanMine.html">
+                <span class="wb-card__icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
+                        stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M4 9.5h16v11H4zM3 6h18v3.5H3zM12 6v14.5" />
+                        <path d="M12 6c-1.7-4-6.4-3.6-6.4-.9C5.6 7.5 9 6 12 6Zm0 0c1.7-4 6.4-3.6 6.4-.9C18.4 7.5 15 6 12 6Z" />
+                    </svg>
+                </span>
+                <span class="wb-card__body"><strong>我的礼品兑换</strong><span>查看积分礼品与兑换记录</span></span>
+                <span class="wb-card__arrow">↗</span>
+            </a>
+        </section>
+
+        <section class="wb-bottom">
+            <div class="wb-panel">
+                <div class="wb-panel__head">
+                    <strong>会员小贴士</strong>
+                    <span>MEMBER GUIDE</span>
+                </div>
+                <div class="wb-tip"><b>1</b><span>下单前确认收货地址与联系方式，装备会更快到达你的校园主场。</span></div>
+                <div class="wb-tip"><b>2</b><span>在“我的订单”里可以随时查看发货与结算状态。</span></div>
+                <div class="wb-tip"><b>3</b><span>积分可以兑换运动好礼，记得常回来看看新的礼品。</span></div>
+            </div>
+
+            <div class="wb-panel wb-panel--sport">
+                <div class="wb-panel__head">
+                    <strong>运动宣言</strong>
+                    <span>KEEP MOVING</span>
+                </div>
+                <p class="wb-quote">训练不必等待状态，<br>先出发，<br><em>状态自然会跟上。</em></p>
+                <div class="wb-sign">CAMPUS SPORTS CLUB · 2026</div>
+            </div>
+        </section>
+    </main>
+</body>
+
+</html>

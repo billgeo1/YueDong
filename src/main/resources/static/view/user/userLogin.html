@@ -1,0 +1,180 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="登录跃动体育大学生体育用品网，管理你的运动装备、收藏与订单。">
+    <meta name="author" content="跃动体育">
+
+    <title>登录｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="auth-section">
+            <div class="container">
+                <a href="/view/index.html" class="page-back">
+                    <i class="bi bi-arrow-left"></i> 返回首页
+                </a>
+
+                <div class="auth-card">
+                    <div class="auth-visual">
+                        <span class="auth-visual__court" aria-hidden="true"></span>
+                        <span class="auth-visual__ball" aria-hidden="true"><i class="bi bi-dribbble"></i></span>
+                        <div class="auth-visual__brand">
+                            <i class="bi bi-lightning-charge-fill"></i>
+                            Yuedong Campus Sports
+                        </div>
+                        <h2>每一次登录<br>都为下一次上场</h2>
+                        <p>回到你的装备清单，继续为训练、比赛和校园生活做好准备。</p>
+                        <div class="auth-features">
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 收藏你的球场装备</div>
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 随时查看购物车与订单</div>
+                            <div class="auth-feature"><i class="bi bi-check-circle-fill"></i> 参与校园运动社区交流</div>
+                        </div>
+                    </div>
+
+                    <div class="auth-form-wrap">
+                        <span class="auth-form-wrap__kicker">Welcome Back / 欢迎归队</span>
+                        <h1>登录跃动体育</h1>
+                        <p>输入账号和密码，回到你的校园运动主场。</p>
+
+                        <form class="sports-form" name="formLogin" method="post" @submit.prevent="userLogin()">
+                            <div class="form-group">
+                                <label for="login-username">账号</label>
+                                <div class="input-wrap">
+                                    <i class="bi bi-person"></i>
+                                    <input id="login-username" type="text" v-model="username" name="username"
+                                           autocomplete="username" placeholder="请输入登录账号">
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="login-password">密码</label>
+                                <div class="input-wrap">
+                                    <i class="bi bi-shield-lock"></i>
+                                    <input id="login-password" type="password" v-model="password" name="password"
+                                           autocomplete="current-password" placeholder="请输入登录密码">
+                                </div>
+                            </div>
+
+                            <div class="sports-form__error" v-if="formError" role="alert">
+                                <i class="bi bi-exclamation-circle"></i> {{formError}}
+                            </div>
+
+                            <button type="submit" class="sports-form__submit" :disabled="isSubmitting">
+                                {{isSubmitting ? '正在登录...' : '登录并继续'}}
+                                <i class="bi bi-arrow-right"></i>
+                            </button>
+                        </form>
+
+                        <div class="auth-switch">
+                            还没有跃动账号？
+                            <a href="/view/user/userReg.html">立即注册</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            username: "",
+            password: "",
+            user: {},
+            formError: "",
+            isSubmitting: false
+        },
+
+        methods: {
+            getData()
+            {
+            },
+
+            userLogin()
+            {
+                this.formError = "";
+
+                if (this.username == "")
+                {
+                    this.formError = "请输入账号";
+                    return;
+                }
+                if (this.password == "")
+                {
+                    this.formError = "请输入密码";
+                    return;
+                }
+
+                this.isSubmitting = true;
+                axios({
+                    method: 'POST',
+                    url: '/userLogin',
+                    params: {
+                        username: this.username,
+                        password: this.password
+                    }
+                }).then(data => {
+                    if (data.data.state == 66)
+                    {
+                        var user = data.data.data;
+                        sessionStorage.setItem("user", JSON.stringify(user));
+                        location.href = "/view/index.html";
+                    }
+                    if (data.data.state == 45)
+                    {
+                        this.formError = "账号不存在，请检查后重试";
+                    }
+                    if (data.data.state == 46)
+                    {
+                        this.formError = "密码错误，请重新输入";
+                    }
+                }).catch(error => {
+                    this.formError = "登录暂时不可用，请稍后再试";
+                }).finally(() => {
+                    this.isSubmitting = false;
+                })
+            }
+        },
+
+        created()
+        {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

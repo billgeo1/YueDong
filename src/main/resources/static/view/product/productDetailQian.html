@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="查看大学生体育用品详情、价格、库存与同学评价。">
+    <meta name="author" content="跃动体育">
+    <title>装备详情｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero">
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <a href="/view/product/productSea.html">全部装备</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>装备详情</span>
+                </div>
+                <span class="sports-page-hero__kicker">Match Ready / 上场准备</span>
+                <h1>装备到位，状态全开</h1>
+                <p>认真挑一件适合你的运动装备。看清规格、库存和同学评价，再决定下一次训练带什么上场。</p>
+            </div>
+        </section>
+
+        <section class="detail-section">
+            <div class="container">
+                <a href="/view/product/productSea.html" class="back-link">
+                    <i class="bi bi-arrow-left"></i> 返回装备列表
+                </a>
+
+                <article class="detail-card">
+                    <div class="detail-media">
+                        <img :src="product.image" @error="useFallbackImage" :alt="product.title">
+                        <span class="detail-media__sport-tag"><i class="bi bi-lightning-charge-fill"></i> Campus Training Pick</span>
+                    </div>
+
+                    <div class="detail-info">
+                        <span class="detail-category">跃动校园精选 / Sports Gear</span>
+                        <h1>{{product.title || '正在加载装备'}}</h1>
+                        <p class="detail-subtitle">为大学生训练、体育课与校园比赛场景准备的实用装备。选对装备，让每一次练习更有节奏。</p>
+
+                        <div class="detail-price-row">
+                            <div class="detail-price"><small>¥</small>{{product.price}}</div>
+                            <div class="text-end">
+                                <span class="detail-stock"><i class="bi bi-box-seam me-1"></i>库存 {{product.kucun || 0}}</span>
+                                <div class="detail-sales mt-2">已售 {{product.xiaoliang || 0}} 件</div>
+                            </div>
+                        </div>
+
+                        <div class="detail-option">
+                            <label>选择数量</label>
+                            <div class="qty-control">
+                                <input type="button" value="-" @click="sub()" aria-label="减少数量">
+                                <input name="shuliang" v-model="cart.shuliang" type="text" readonly="readonly">
+                                <input type="button" value="+" @click="add()" aria-label="增加数量">
+                            </div>
+                        </div>
+
+                        <div class="detail-actions">
+                            <button type="button" class="sports-btn sports-btn--cart" @click="jiagou(product)">
+                                <i class="bi bi-bag-plus"></i> 加入购物车
+                            </button>
+                            <button type="button" class="sports-btn sports-btn--favorite" @click="shoucangAdd(product)" aria-label="收藏商品">
+                                <i class="bi bi-heart"></i> 收藏
+                            </button>
+                        </div>
+                        <div class="detail-btn-note">加入购物车后可继续挑选，库存数量以商品页展示为准</div>
+
+                        <div class="detail-trust">
+                            <span><i class="bi bi-patch-check-fill"></i> 正品精选</span>
+                            <span><i class="bi bi-mortarboard-fill"></i> 校园适配</span>
+                            <span><i class="bi bi-box-seam"></i> 库存透明</span>
+                        </div>
+                    </div>
+                </article>
+
+                <div class="detail-lower">
+                    <section class="detail-panel">
+                        <span class="sports-eyebrow">Equipment Story</span>
+                        <h2>装备详情</h2>
+                        <div class="description-content" v-if="product.jieshao" v-html="product.jieshao"></div>
+                        <div class="review-empty" v-else>商品详情正在补充中，更多装备信息请以实物和页面参数为准。</div>
+                    </section>
+
+                    <section class="detail-panel">
+                        <span class="sports-eyebrow">Campus Reviews</span>
+                        <h2>同学评价</h2>
+                        <div class="review-tabs" role="tablist">
+                            <button type="button" :class="{active: activeReview === 'haoping'}" @click="activeReview = 'haoping'">
+                                好评 <span>{{haopingList.length}}</span>
+                            </button>
+                            <button type="button" :class="{active: activeReview === 'zhongping'}" @click="activeReview = 'zhongping'">
+                                中评 <span>{{zhongpingList.length}}</span>
+                            </button>
+                            <button type="button" :class="{active: activeReview === 'chaping'}" @click="activeReview = 'chaping'">
+                                差评 <span>{{chapingList.length}}</span>
+                            </button>
+                        </div>
+
+                        <div class="review-content">
+                            <div v-show="activeReview === 'haoping'">
+                                <div class="review-item" v-for="pingjia in haopingList" :key="pingjia.id">
+                                    <div class="review-item__head">
+                                        <span class="review-item__avatar">{{reviewInitial(pingjia)}}</span>
+                                        <span class="review-item__author">{{reviewName(pingjia)}}</span>
+                                        <span>{{pingjia.shijian}}</span>
+                                    </div>
+                                    <p>{{pingjia.neirong}}</p>
+                                </div>
+                                <div class="review-empty" v-if="!haopingList.length">还没有好评，等你来做第一个分享体验的同学。</div>
+                            </div>
+
+                            <div v-show="activeReview === 'zhongping'">
+                                <div class="review-item" v-for="pingjia in zhongpingList" :key="pingjia.id">
+                                    <div class="review-item__head">
+                                        <span class="review-item__avatar">{{reviewInitial(pingjia)}}</span>
+                                        <span class="review-item__author">{{reviewName(pingjia)}}</span>
+                                        <span>{{pingjia.shijian}}</span>
+                                    </div>
+                                    <p>{{pingjia.neirong}}</p>
+                                </div>
+                                <div class="review-empty" v-if="!zhongpingList.length">暂无中评，大家的装备体验都很不错。</div>
+                            </div>
+
+                            <div v-show="activeReview === 'chaping'">
+                                <div class="review-item" v-for="pingjia in chapingList" :key="pingjia.id">
+                                    <div class="review-item__head">
+                                        <span class="review-item__avatar">{{reviewInitial(pingjia)}}</span>
+                                        <span class="review-item__author">{{reviewName(pingjia)}}</span>
+                                        <span>{{pingjia.shijian}}</span>
+                                    </div>
+                                    <p>{{pingjia.neirong}}</p>
+                                </div>
+                                <div class="review-empty" v-if="!chapingList.length">暂无差评，期待你分享真实使用感受。</div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="sport-promo-strip">
+                    <div>
+                        <h3>还差一件训练搭子？</h3>
+                        <p>继续逛逛不同运动分类，把装备清单一次配齐。</p>
+                    </div>
+                    <div class="sport-promo-strip__tags">
+                        <a href="/view/product/productByLeibie.html?leibieId=26">篮球 / 足球</a>
+                        <a href="/view/product/productByLeibie.html?leibieId=27">网球</a>
+                        <a href="/view/product/productByLeibie.html?leibieId=28">乒乓球</a>
+                        <a href="/view/product/productByLeibie.html?leibieId=29">羽毛球</a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            product: {},
+            cart: {
+                id: "",
+                userId: "",
+                productId: "",
+                shuliang: 1
+            },
+            haopingList: [],
+            zhongpingList: [],
+            chapingList: [],
+            activeReview: "haoping",
+            shoucang: {
+                id: "",
+                userId: "",
+                productId: "",
+                shijian: ""
+            }
+        },
+
+        methods: {
+            getData() {
+                axios({
+                    method: 'POST',
+                    url: '/productDetailQian',
+                    params: {
+                        id: getUrlParam("id")
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.product = data.data.data;
+                        document.title = (this.product.title || "装备详情") + "｜跃动体育";
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            useFallbackImage(event) {
+                var fallback = "/images/product-placeholder.svg";
+                if (event.target.src.indexOf(fallback) === -1) {
+                    event.target.src = fallback;
+                }
+            },
+
+            reviewName(pingjia) {
+                return pingjia.user && pingjia.user.username ? pingjia.user.username : "校园运动爱好者";
+            },
+
+            reviewInitial(pingjia) {
+                var name = this.reviewName(pingjia);
+                return name.charAt(0);
+            },
+
+            jiagou(product) {
+                var userJsonString = sessionStorage.getItem("user");
+                if (userJsonString == null) {
+                    alert("请先登录");
+                    return false;
+                }
+                var user = JSON.parse(userJsonString);
+
+                this.cart.userId = user.uid;
+                this.cart.productId = product.id;
+
+                axios({
+                    method: 'POST',
+                    url: '/getKucun',
+                    params: {
+                        id: product.id
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        var kucun = data.data.data;
+                        if (this.cart.shuliang > kucun) {
+                            alert("库存不足");
+                            return false;
+                        } else {
+                            this.jiagou1();
+                        }
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            jiagou1() {
+                axios({
+                    method: 'POST',
+                    url: '/addcart',
+                    data: this.cart
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        alert("成功加购");
+                        window.location.href = "/view/cart/cartMine.html";
+                    }
+                    if (data.data.state == 100) {
+                        alert("session超时，请重新登录");
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            shoucangAdd(product) {
+                var userJsonString = sessionStorage.getItem("user");
+                if (userJsonString == null) {
+                    alert("请先登录");
+                    return false;
+                }
+                var user = JSON.parse(userJsonString);
+
+                this.shoucang.userId = user.uid;
+                this.shoucang.productId = product.id;
+
+                axios({
+                    method: 'POST',
+                    url: '/shoucangAdd',
+                    data: this.shoucang
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        alert("收藏成功");
+                        window.location.href = "/view/shoucang/shoucangMine.html";
+                    }
+                    if (data.data.state == 77) {
+                        alert("请不要重复收藏");
+                    }
+                    if (data.data.state == 100) {
+                        alert("session超时，请重新登录");
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            sub() {
+                if (this.cart.shuliang > 1) {
+                    this.cart.shuliang--;
+                }
+            },
+
+            add() {
+                if (this.cart.shuliang < 44444) {
+                    this.cart.shuliang++;
+                }
+            },
+
+            getHaopingList() {
+                axios({
+                    method: 'POST',
+                    url: '/haopingList',
+                    params: {
+                        productId: getUrlParam("id")
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.haopingList = data.data.data;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            getZhongpingList() {
+                axios({
+                    method: 'POST',
+                    url: '/zhongpingList',
+                    params: {
+                        productId: getUrlParam("id")
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.zhongpingList = data.data.data;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            getChapingList() {
+                axios({
+                    method: 'POST',
+                    url: '/chapingList',
+                    params: {
+                        productId: getUrlParam("id")
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.chapingList = data.data.data;
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            }
+        },
+
+        created() {
+            this.getData();
+            this.getHaopingList();
+            this.getZhongpingList();
+            this.getChapingList();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

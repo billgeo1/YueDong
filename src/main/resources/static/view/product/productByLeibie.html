@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="浏览大学生体育用品分类，精选篮球、足球、网球、乒乓球和羽毛球装备。">
+    <meta name="author" content="跃动体育">
+    <title>商品分类｜跃动体育</title>
+
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <link href="/css/bootstrap-icons.css" rel="stylesheet">
+    <link href="/css/templatemo-kind-heart-charity.css" rel="stylesheet">
+
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/httpVueLoader.js"></script>
+    <script type="text/javascript" src="/js/axios.min.js"></script>
+</head>
+
+<body>
+<div id="app">
+    <my-header></my-header>
+
+    <main>
+        <section class="sports-page-hero sports-page-hero--art">
+            <div class="sports-page-hero__art" aria-hidden="true">
+                <img src="/images/33.jpg" alt="">
+            </div>
+            <span class="sports-page-hero__line" aria-hidden="true"></span>
+            <div class="container">
+                <div class="sports-breadcrumb">
+                    <a href="/view/index.html">首页</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <a href="/view/product/productSea.html">全部装备</a>
+                    <i class="bi bi-chevron-right"></i>
+                    <span>{{currentCategory.name}}</span>
+                </div>
+                <span class="sports-page-hero__kicker">{{currentCategory.english}}</span>
+                <h1>{{currentCategory.name}}装备</h1>
+                <p>{{currentCategory.description}}</p>
+            </div>
+        </section>
+
+        <section class="shop-section">
+            <div class="container">
+                <div class="category-switcher">
+                    <a class="filter-chip" :class="{active: leibieId == 26}" href="/view/product/productByLeibie.html?leibieId=26">篮球 / 足球</a>
+                    <a class="filter-chip" :class="{active: leibieId == 27}" href="/view/product/productByLeibie.html?leibieId=27">网球运动</a>
+                    <a class="filter-chip" :class="{active: leibieId == 28}" href="/view/product/productByLeibie.html?leibieId=28">乒乓球运动</a>
+                    <a class="filter-chip" :class="{active: leibieId == 29}" href="/view/product/productByLeibie.html?leibieId=29">羽毛球运动</a>
+                </div>
+
+                <div class="shop-toolbar">
+                    <div>
+                        <span class="sports-eyebrow">Campus Equipment / 校园装备</span>
+                        <h2>{{currentCategory.name}}精选</h2>
+                        <p>{{currentCategory.tip}}</p>
+                    </div>
+                    <span class="result-count"><i class="bi bi-grid-3x3-gap-fill"></i> 共 {{productList.length}} 件</span>
+                </div>
+
+                <div class="row product-grid-row" v-if="productList.length">
+                    <div class="col-lg-3 col-md-6 col-12" v-for="(product, index) in productList" :key="product.id">
+                        <article class="product-card">
+                            <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__media">
+                                <span class="product-card__badge">{{currentCategory.shortName}}</span>
+                                <img :src="product.image" @error="useFallbackImage" :alt="product.title">
+                            </a>
+                            <div class="product-card__body">
+                                <div class="product-card__category">Campus Field Pick</div>
+                                <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__title">{{product.title}}</a>
+                                <div class="product-card__footer">
+                                    <div>
+                                        <div class="product-price"><small>¥</small>{{product.price}}</div>
+                                        <div class="product-meta">已售 {{product.xiaoliang || 0}} 件 · 库存 {{product.kucun || 0}}</div>
+                                    </div>
+                                    <a :href="'/view/product/productDetailQian.html?id='+product.id" class="product-card__arrow" aria-label="查看商品">
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+                </div>
+
+                <div class="empty-state" v-else>
+                    <i class="bi bi-box-seam"></i>
+                    <strong>这个分类的装备正在补货</strong>
+                    先看看其他运动装备，保持训练状态
+                    <div class="mt-3">
+                        <a href="/view/product/productSea.html" class="sports-btn sports-btn--lime">浏览全部装备 <i class="bi bi-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <div class="benefit-strip">
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-patch-check-fill"></i></span>
+                        <span><strong>校园正品精选</strong><span>严选适合大学生的运动装备</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-lightning-charge-fill"></i></span>
+                        <span><strong>训练状态在线</strong><span>从基础练习到校园联赛</span></span>
+                    </div>
+                    <div class="benefit-item">
+                        <span class="benefit-item__icon"><i class="bi bi-box-seam"></i></span>
+                        <span><strong>库存价格透明</strong><span>选装备更省心，下单更安心</span></span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <my-foot></my-foot>
+</div>
+
+<script>
+    function getUrlParam(name)
+    {
+        var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+        var r = window.location.search.substr(1).match(reg);
+        if (r != null) return unescape(r[2]);
+        return null;
+    }
+
+    new Vue({
+        el: '#app',
+        data: {
+            productList: [],
+            leibieId: getUrlParam("leibieId") || "26",
+            categoryMap: {
+                "26": {
+                    name: "篮球 / 足球",
+                    shortName: "Court",
+                    english: "Court Energy / 球场能量",
+                    description: "从日常投篮到校园联赛，选择抓握、耐用与手感兼具的球类装备，让每一次触球都更有信心。",
+                    tip: "适合体育课、社团训练与校园球赛"
+                },
+                "27": {
+                    name: "网球运动",
+                    shortName: "Tennis",
+                    english: "Tennis Club / 网球俱乐部",
+                    description: "从第一支球拍到专项训练器，为课后练习和校园网球活动准备更顺手的装备。",
+                    tip: "从入门练习到专项技术训练"
+                },
+                "28": {
+                    name: "乒乓球运动",
+                    shortName: "Ping Pong",
+                    english: "Table Tennis / 乒乓球",
+                    description: "课间、社团、宿舍都能开打。挑选适合自己的球拍，把每一次挥拍练成稳定节奏。",
+                    tip: "轻量上手，适合高频练习"
+                },
+                "29": {
+                    name: "羽毛球运动",
+                    shortName: "Badminton",
+                    english: "Badminton Life / 羽毛球生活",
+                    description: "兼顾挥拍速度与手感，陪你从体育馆练习走向校园赛场，打出属于自己的节奏。",
+                    tip: "为速度、控制与连续对打而选"
+                }
+            }
+        },
+
+        computed: {
+            currentCategory() {
+                return this.categoryMap[this.leibieId] || {
+                    name: "运动装备",
+                    shortName: "Sports",
+                    english: "Campus Equipment / 校园装备",
+                    description: "为大学生精选实用、耐用的运动装备，让每一次训练和比赛都准备充分。",
+                    tip: "发现适合你的校园运动装备"
+                };
+            }
+        },
+
+        methods: {
+            getData() {
+                axios({
+                    method: 'POST',
+                    url: '/productByLeibie',
+                    params: {
+                        leibieId: this.leibieId
+                    }
+                }).then(data => {
+                    if (data.data.state == 66) {
+                        this.productList = data.data.data;
+                        document.title = this.currentCategory.name + "｜跃动体育";
+                    }
+                }).catch(error => {
+                    alert(error);
+                })
+            },
+
+            useFallbackImage(event) {
+                var fallback = "/images/product-placeholder.svg";
+                if (event.target.src.indexOf(fallback) === -1) {
+                    event.target.src = fallback;
+                }
+            }
+        },
+
+        created() {
+            this.getData();
+        },
+
+        components: {
+            'my-header': httpVueLoader('/components/my-header.vue'),
+            'my-foot': httpVueLoader('/components/my-foot.vue')
+        }
+    })
+</script>
+
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+</body>
+</html>

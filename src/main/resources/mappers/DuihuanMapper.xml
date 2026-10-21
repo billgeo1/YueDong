@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.DuihuanMapper">
+  
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_duihuan
+       (
+            userId,
+			lipin,
+			shijian,
+			
+			xingming,
+			dizhi,
+			dianhua,
+			beizhu,
+			
+			zt
+       ) 
+       values 
+       (
+            #{userId},
+			#{lipin},
+			#{shijian},
+			
+			#{xingming},
+			#{dizhi},
+			#{dianhua},
+			#{beizhu},
+			
+			#{zt}
+       )
+   </insert>
+   
+   
+   
+   
+   
+   <delete id="delete">
+       delete from t_duihuan where id=#{id}
+   </delete>
+   
+   
+   
+   
+   
+   
+   
+   <update id="update">
+       update t_duihuan set 
+            xingming=#{xingming},
+            dizhi=#{dizhi},
+            dianhua=#{dianhua},
+            beizhu=#{beizhu},
+            zt=#{zt}
+            where id= #{id}
+   </update>
+   
+   
+      
+   <update id="updateZt">
+       update t_duihuan set 
+            zt=#{zt}
+            where id= #{id}
+   </update>
+   
+    
+   
+   
+   <select id="selectAll" resultType="com.xiangmu.pojo.Duihuan">
+      select * from t_duihuan where xingming like "%" #{xingming} "%" order by id desc
+   </select>
+   
+   
+   
+   <select id="selectByUserId" resultType="com.xiangmu.pojo.Duihuan">
+      select * from t_duihuan where userId =#{userId}
+   </select>
+   
+   
+   
+   
+   <select id="findById" resultType="com.xiangmu.pojo.Duihuan">
+      select * from t_duihuan where id =#{id}
+   </select>
+   
+   
+   
+   
+   
+   
+   
+   
+</mapper>
+
+  
+  

@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+<mapper namespace="com.xiangmu.mappers.AddressMapper">
+  
+   <!-- public int insert(Address address); -->
+   <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+       insert into t_address(
+            <!-- id -->
+            userId,
+			xingming,
+			dizhi,
+			
+			dianhua
+       ) values 
+       (
+           <!--  #{id}, -->
+            #{userId},
+			#{xingming},
+			#{dizhi},
+			
+			#{dianhua}
+       )
+   </insert>
+   
+   
+   <!-- public int del(int id); -->
+   <delete id="del">
+       delete from t_address where id=#{id}
+   </delete>
+   
+   
+   <!-- public int update(Address address); -->
+   <update id="update">
+       update t_address set 
+          xingming=#{xingming},
+          dizhi=#{dizhi},
+          dianhua=#{dianhua} 
+          where id= #{id}
+          
+   </update>
+   
+   
+   
+  
+   <!-- public List select(String xingming,String dizhi,int userId); -->
+   <select id="select" resultType="com.xiangmu.pojo.Address">
+      select * from t_address where xingming like "%" #{xingming} "%" and  dizhi like "%" #{dizhi} "%" and userId =#{userId}
+   </select>
+   
+   
+   <!-- public Address findById(int id); -->
+   <select id="findById" resultType="com.xiangmu.pojo.Address">
+      select * from t_address where id =#{id}
+   </select>
+</mapper>
+
+  
+  

@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+<style scoped>
+	/* input{border: 1px solid #ccc; padding: 5px 0px; border-radius: 3px; padding-left:5px; }
+	*{color: #848482;}*/
+ 
+
+</style>
+
+
+<script src="/js/vue.min.js"></script>
+
+<link href="/css/base.css" rel="stylesheet" type="text/css">
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+           
+</head>
+
+<body >
+  <div id="leibieDiv">
+	       <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#F5F5F5" style="margin-bottom:8px">
+						
+						<tr bgcolor="#FFFFFF" style="height: 68px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          类别名称：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" v-model="leibie.mingcheng" size="35"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="leibieAdd()" class="lanse" style="width: 86px;"/>&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#leibieDiv',
+		data: 
+		{
+			leibie:{
+				id:"",
+				mingcheng:"",
+				jieshao:"",
+			},
+		},
+		methods: 
+		{
+			leibieAdd()
+			{
+				if(this.leibie.mingcheng =="")
+				{
+					alert("请输入名称");return false;
+				} 
+				this.add();
+			},
+
+			add()
+			{
+				axios({
+						method: 'POST',
+						url: '/leibieAdd',
+						data: this.leibie,
+						/* params:{
+							username:this.leibie.userName,
+							password:this.leibie.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("添加成功");
+								location.href="/admin/leibie/leibieMana.html";
+							} 
+						    if (data.data.state == 44)
+							{
+								
+							}
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+			
+
+
+
+		}
+	
+	    
+	})
+</script>
+
+
+
+
+
+</body>
+</html>

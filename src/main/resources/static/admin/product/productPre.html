@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>无标题文档</title>
+
+
+<style scoped>
+	/* input{border: 1px solid #ccc: padding: 5px 0px; border-radius: 3px; padding-left:5px; }
+	*{color: #848482:}*/
+ 
+
+</style>
+
+
+<script src="/js/vue.min.js"></script>
+
+<link href="/css/base.css" rel="stylesheet" type="text/css">
+<link href="/css/sports-console.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="/js/axios.min.js"></script>
+
+<script src="/ckeditor/ckeditor.js"></script>
+
+<script type="text/javascript" src="/layer/jquery-2.0.3.min.js"></script>
+<script type="text/javascript" src="/layer/layer.js"></script>
+
+<script language="javascript">
+	function getUrlParam(name) 
+	{
+		var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+		var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+		if (r != null) return unescape(r[2]); return null; //返回参数值
+	}
+</script>
+           
+</head>
+
+<body >
+  <div id="productDiv">
+	       <table width="98%" align="center" border="0" cellpadding="4" cellspacing="1" bgcolor="#F5F5F5" style="margin-bottom:8px">
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        类别：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <select class="select" v-model="product.leibieId">
+									<option value="0">--请选择类别--</option>
+									<option v-for="(leibie, index) in leibieList" :key="leibie.id" :value="leibie.id">{{leibie.mingcheng}}</option>
+								</select>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        商品标题：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <input type="text" name="title" v-model.trim="product.title" size="55"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        商品介绍：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						        <textarea class="ckeditor" name="jieshao1" v-model.trim="product.jieshao"></textarea>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						          图片：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+								<input type="text" size="60" readonly="readonly" v-model="product.image"/><br/>
+						        <input type="file" ref="fileRef" accept="*" @change="handleFileChange($event)"/>
+								<input type="button" value="上传" style="width: 66px;" @click="upload()"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						         单价：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+								<input type="text" name="price" size="33" v-model="product.price"
+								onkeyup="value=value.replace(/[^\d]/g,'') " 
+								onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+						    </td>
+						</tr>
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						       库存：
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+								<input type="text" name="kucun" size="33" v-model="product.kucun"
+								onkeyup="value=value.replace(/[^\d]/g,'') " 
+								onbeforepaste="clipboardData.setData('text',clipboardData.getData('text').replace(/[^\d]/g,''))"/>
+						    </td>
+						</tr>
+						
+						<tr bgcolor="#FFFFFF" style="height: 38px;">
+						    <td width="103" bgcolor="#FFFFFF" align="right">
+						        &nbsp;
+						    </td>
+						    <td bgcolor="#FFFFFF" align="left">
+						       <input type="button" value="提交" @click="productUpdate()" class="lanse" style="width: 86px;"/>&nbsp; 
+						    </td>
+						</tr>
+					 </table>
+  </div>
+  
+
+
+<script type="text/javascript">
+	var vm = new Vue({
+		
+		el: '#productDiv',
+		data: 
+		{
+			product:{
+				id:'',
+				leibieId:'0',
+				title:'',
+				jieshao:'',
+				
+				image:'/img/zanwu.jpg',
+				price:'100',
+				kucun:'100',
+				del:'no',
+			},
+
+			
+			file:"",
+			leibieList:[],
+		},
+		methods: 
+		{
+			productAdd()
+			{
+				this.product.jieshao=CKEDITOR.instances.jieshao1.getData(); 
+
+				if(this.product.leibieId ==0)
+				{
+					alert("请选择类别");return false;
+				} 
+
+				if(this.product.title =="")
+				{
+					alert("请输入信息标题");return false;
+				} 
+
+				if(this.product.price ==" ")
+				{
+					alert("请输入价格");return false;
+				} 
+
+				if(this.product.kucun ==" ")
+				{
+					alert("请输入库存");return false;
+				} 
+				
+				this.add();
+			},
+
+			productXixin()
+			{
+				axios({
+						method: 'POST',
+						url: '/productDetailQian',
+						//data: this.product,
+						params:{
+							id:getUrlParam('id'),
+						} 
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.product=data.data.data;
+							} 
+						    
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+			
+
+			handleFileChange(event) 
+			{
+				this.file = event.target.files[0];
+			},
+
+			upload()
+			{
+				/* if(this.$refs.fileRef.value=="") */
+				if(this.file=="")
+				{
+					alert("请选择文件");
+					return false;
+				}
+
+				let formFile = new FormData();
+				formFile.append("file", this.file);
+				
+                axios({
+						method: 'POST',
+						url: '/upload',
+						data: formFile, 
+						/* params:{
+							username:this.product.userName,
+							password:this.product.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("上传成功");
+								this.file='';
+								var fujian=data.data.data; 
+								this.product.image=fujian.fujian;
+								//this.product.fujianYuan=fujian.fujianYuan;
+							} 
+						}).catch(error => {
+							alert(error);
+				})
+
+
+			},
+
+			
+
+			productUpdate()
+			{
+				this.product.jieshao=CKEDITOR.instances.jieshao1.getData(); 
+
+				if(this.product.leibieId =="0")
+				{
+					alert("请选择类别");return false;
+				}
+
+				if(this.product.title =="")
+				{
+					alert("请输入信息标题");return false;
+				} 
+
+				if(this.product.price ==" ")
+				{
+					alert("请输入价格");return false;
+				} 
+
+				if(this.product.kucun ==" ")
+				{
+					alert("请输入库存");return false;
+				} 
+				
+				this.update();
+			},
+
+			update()
+			{
+				axios({
+						method: 'POST',
+						url: '/productUpdate',
+						data: this.product,
+						/* params:{
+							username:this.product.userName,
+							password:this.product.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								alert("修改成功");
+								location.href="/admin/product/productMana.html";
+							} 
+						    
+							
+						}).catch(error => {
+							alert(error);
+						})
+			},
+
+			leibieAll()
+			{
+               axios({
+						method: 'POST',
+						url: '/leibieAll',
+						/* data: this.laoshi, */
+						/* params:{
+							username:this.laoshi.userName,
+							password:this.laoshi.userPw,
+						} */
+						}).then(data => {
+							if (data.data.state == 66)
+							{
+								this.leibieList=data.data.data;
+							} 
+						}).catch(error => {
+							alert(error);
+				})
+			},
+
+			
+		},
+
+		created()
+		{
+			this.leibieAll();
+			this.productXixin();
+		}
+	
+	    
+	})
+</script>
+
+
+
+
+
+</body>
+</html>
