@@ -480,6 +480,38 @@ body.console-login {
   background: var(--console-lime);
 }
 
+.admin .body .left .navTools .console-agent-entry {
+  background:
+    linear-gradient(105deg, rgba(201, 242, 93, 0.16), rgba(255, 107, 61, 0.08)) !important;
+  border: 1px solid rgba(201, 242, 93, 0.2);
+  color: #fff !important;
+}
+
+.admin .body .left .navTools .console-agent-entry::before {
+  background: var(--console-lime);
+  box-shadow: 0 0 0 4px rgba(201, 242, 93, 0.12);
+}
+
+.admin .body .left .navTools .console-agent-entry:hover {
+  background:
+    linear-gradient(105deg, rgba(201, 242, 93, 0.24), rgba(255, 107, 61, 0.12)) !important;
+  border-color: rgba(201, 242, 93, 0.42);
+}
+
+.admin .body .left .navTools .console-agent-entry a {
+  align-items: center;
+}
+
+.admin .body .left .navTools .console-agent-entry b {
+  background: var(--console-lime);
+  border-radius: 99px;
+  color: var(--console-ink);
+  font-size: 7px;
+  letter-spacing: 0.08em;
+  margin-left: auto;
+  padding: 3px 7px;
+}
+
 .admin .body .left .navTools .indexLink a {
   color: inherit !important;
   display: flex;
@@ -1609,6 +1641,51 @@ button.button:hover {
 .wb-card:hover .wb-card__arrow {
   color: var(--console-orange) !important;
   transform: translate(2px, -2px);
+}
+
+.wb-card--agent {
+  background:
+    radial-gradient(circle at 88% 8%, rgba(201, 242, 93, 0.18), transparent 32%),
+    linear-gradient(135deg, #111827, #1d2c43);
+  border-color: rgba(17, 24, 39, 0.92);
+}
+
+.wb-card--agent .wb-card__icon {
+  background: var(--console-lime);
+  color: var(--console-ink) !important;
+}
+
+.wb-card--agent .wb-card__body strong {
+  color: #fff !important;
+}
+
+.wb-card--agent .wb-card__body strong i {
+  background: var(--console-lime);
+  border-radius: 99px;
+  color: var(--console-ink);
+  font-size: 7px;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  margin-left: 5px;
+  padding: 3px 7px;
+  vertical-align: 1px;
+}
+
+.wb-card--agent .wb-card__body span {
+  color: rgba(255, 255, 255, 0.52) !important;
+}
+
+.wb-card--agent .wb-card__arrow {
+  color: rgba(255, 255, 255, 0.38) !important;
+}
+
+.wb-card--agent:hover {
+  border-color: rgba(201, 242, 93, 0.7);
+  box-shadow: 0 18px 38px rgba(17, 24, 39, 0.2);
+}
+
+.wb-card--agent:hover .wb-card__arrow {
+  color: var(--console-lime) !important;
 }
 
 .wb-bottom {
