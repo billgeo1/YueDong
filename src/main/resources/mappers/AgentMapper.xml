@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiangmu.mappers.AgentMapper">
+
+    <resultMap id="productViewMap" type="com.xiangmu.agent.AgentProductView">
+        <id property="id" column="id"/>
+        <result property="leibieId" column="leibieId"/>
+        <result property="title" column="title"/>
+        <result property="description" column="jieshao"/>
+        <result property="image" column="image"/>
+        <result property="price" column="price"/>
+        <result property="stock" column="kucun"/>
+        <result property="categoryName" column="categoryName"/>
+        <result property="sales" column="sales"/>
+    </resultMap>
+
+    <select id="searchProducts" resultMap="productViewMap">
+        select p.id,
+               p.leibieId,
+               p.title,
+               p.jieshao,
+               p.image,
+               p.price,
+               p.kucun,
+               c.mingcheng as categoryName,
+               coalesce((
+                   select sum(oi.shuliang)
+                   from t_order_item oi
+                   where oi.productId = p.id
+               ), 0) as sales
+        from t_product p
+        left join t_leibie c on c.id = p.leibieId
+        where p.del = 'no'
+        <if test="keyword != null and keyword != ''">
+            and (p.title like concat('%', #{keyword}, '%')
+                 or p.jieshao like concat('%', #{keyword}, '%')
+                 or c.mingcheng like concat('%', #{keyword}, '%'))
+        </if>
+        <if test="categoryId != null">
+            and p.leibieId = #{categoryId}
+        </if>
+        <if test="priceMin != null">
+            and p.price &gt;= #{priceMin}
+        </if>
+        <if test="priceMax != null">
+            and p.price &lt;= #{priceMax}
+        </if>
+        order by
+            case when p.title like concat('%', coalesce(#{keyword}, ''), '%') then 0 else 1 end,
+            sales desc,
+            p.id desc
+        limit #{limit}
+    </select>
+
+    <select id="findProductView" resultMap="productViewMap">
+        select p.id,
+               p.leibieId,
+               p.title,
+               p.jieshao,
+               p.image,
+               p.price,
+               p.kucun,
+               c.mingcheng as categoryName,
+               coalesce((
+                   select sum(oi.shuliang)
+                   from t_order_item oi
+                   where oi.productId = p.id
+               ), 0) as sales
+        from t_product p
+        left join t_leibie c on c.id = p.leibieId
+        where p.id = #{id} and p.del = 'no'
+    </select>
+
+    <select id="businessOverview" resultType="java.util.LinkedHashMap">
+        select
+            (select count(*) from t_product where del = 'no') as productCount,
+            (select count(*) from t_product where del = 'no' and kucun &lt;= 95) as lowStockCount,
+            (select count(*) from t_user where del = 'no') as userCount,
+            (select count(*) from t_order) as orderCount,
+            (select count(*) from t_order where zt = '待发货') as pendingShipmentCount,
+            (select coalesce(sum(zongjine), 0) from t_order) as revenue
+    </select>
+
+    <select id="lowStockProducts" resultType="java.util.LinkedHashMap">
+        select p.id,
+               p.title,
+               p.price,
+               p.kucun as stock,
+               c.mingcheng as categoryName
+        from t_product p
+        left join t_leibie c on c.id = p.leibieId
+        where p.del = 'no' and p.kucun &lt;= #{threshold}
+        order by p.kucun asc, p.id desc
+        limit #{limit}
+    </select>
+
+    <select id="salesRanking" resultType="java.util.LinkedHashMap">
+        select p.id,
+               p.title,
+               p.price,
+               p.kucun as stock,
+               c.mingcheng as categoryName,
+               coalesce(sum(oi.shuliang), 0) as sales,
+               coalesce(sum(oi.shuliang * oi.jiage), 0) as amount
+        from t_product p
+        left join t_leibie c on c.id = p.leibieId
+        left join t_order_item oi on oi.productId = p.id
+        where p.del = 'no'
+        group by p.id, p.title, p.price, p.kucun, c.mingcheng
+        order by sales desc, p.id desc
+        limit #{limit}
+    </select>
+
+    <update id="shipOrderIfPending">
+        update t_order
+        set zt = '已发货'
+        where id = #{id}
+          and zt = '待发货'
+    </update>
+
+</mapper>

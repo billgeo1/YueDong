@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="跃动体育智能经营助手，实时查询经营数据、库存、销量并生成安全的发货草案。">
+    <title>智能经营助手｜跃动体育管理台</title>
+    <link rel="stylesheet" href="/css/sports-console.css">
+    <script src="/js/vue.min.js"></script>
+    <script src="/js/axios.min.js"></script>
+</head>
+
+<body class="console-workbench">
+    <main id="adminAgentApp" class="ba-page">
+        <section class="ba-hero">
+            <div class="ba-hero__copy">
+                <span class="ba-kicker"><i></i> YUE DONG · AGENT 02</span>
+                <h1>经营数据，<br><em>开口即得。</em></h1>
+                <p>连接商城真实的商品、库存、订单与销量数据。查询类工具直接执行，发货等写操作会先生成草案，等待管理员确认。</p>
+                <div class="ba-hero__actions">
+                    <button type="button" @click="useSuggestion('给我一份经营概览')">查看经营概览 <span>→</span></button>
+                    <button type="button" class="is-ghost" @click="useSuggestion('库存低于95的商品')">库存预警</button>
+                </div>
+            </div>
+            <div class="ba-hero__art" aria-hidden="true">
+                <span class="ba-court"></span>
+                <span class="ba-orbit"></span>
+                <span class="ba-ball"><i></i><b></b></span>
+                <span class="ba-float ba-float--a">LIVE DATA</span>
+                <span class="ba-float ba-float--b">HUMAN CONFIRM</span>
+            </div>
+        </section>
+
+        <section v-if="accessError" class="ba-access" role="alert">
+            <span class="ba-access__icon">!</span>
+            <span>
+                <strong>需要管理员登录</strong>
+                <small>{{ accessError }}</small>
+            </span>
+            <a href="/login.html">前往管理员登录 <i>→</i></a>
+        </section>
+
+        <section class="ba-layout">
+            <div class="ba-console">
+                <header class="ba-console__head">
+                    <span class="ba-console__avatar" aria-hidden="true">跃</span>
+                    <span class="ba-console__identity">
+                        <small>BUSINESS COPILOT</small>
+                        <strong>跃动智能经营助手</strong>
+                        <em><i></i>{{ toolCount }} 个经营工具已连接</em>
+                    </span>
+                    <button type="button" class="ba-console__reset" title="清空当前对话" @click="resetChat">↺</button>
+                </header>
+
+                <div ref="messages" class="ba-messages" aria-live="polite">
+                    <article v-for="message in messages" :key="message.id" class="ba-message"
+                        :class="'ba-message--' + message.role">
+                        <template v-if="message.role === 'user'">
+                            <div class="ba-user-bubble">{{ message.text }}</div>
+                        </template>
+                        <template v-else>
+                            <span class="ba-mini-avatar" aria-hidden="true">跃</span>
+                            <div class="ba-answer" :class="{ 'is-error': message.isError }">
+                                <p>{{ message.text }}</p>
+
+                                <div v-if="message.response && message.response.steps" class="ba-steps">
+                                    <span v-for="(step, index) in message.response.steps" :key="index">
+                                        <i></i>{{ step.label }}
+                                    </span>
+                                </div>
+
+                                <div v-if="metricEntries(message).length" class="ba-metrics">
+                                    <div v-for="entry in metricEntries(message)" :key="entry.key" class="ba-metric">
+                                        <small>{{ metricLabel(entry.key) }}</small>
+                                        <strong>{{ metricValue(entry.key, entry.value) }}</strong>
+                                    </div>
+                                </div>
+
+                                <div v-if="message.response && message.response.items" class="ba-records">
+                                    <div v-for="(item, index) in message.response.items" :key="index"
+                                        class="ba-record">
+                                        <span class="ba-record__index">{{ String(index + 1).padStart(2, '0') }}</span>
+                                        <span class="ba-record__copy">
+                                            <small>{{ item.categoryName || '运动装备' }}</small>
+                                            <strong>{{ item.title }}</strong>
+                                        </span>
+                                        <span class="ba-record__meta">
+                                            <b v-if="item.sales !== undefined">{{ item.sales }} 件</b>
+                                            <b v-else-if="item.price !== undefined">¥{{ item.price }}</b>
+                                            <em v-if="item.stock !== undefined">库存 {{ item.stock }}</em>
+                                            <em v-if="item.amount !== undefined">¥{{ item.amount }}</em>
+                                        </span>
+                                    </div>
+                                </div>
+
+                                <div v-if="message.response && message.response.confirmation" class="ba-confirm"
+                                    :class="{ 'is-done': message.confirmationStatus === 'done' }">
+                                    <div class="ba-confirm__top">
+                                        <span>WAITING FOR APPROVAL</span>
+                                        <i>{{ riskText(message.response.confirmation.riskLevel) }}</i>
+                                    </div>
+                                    <strong>{{ message.response.confirmation.title }}</strong>
+                                    <p>{{ message.response.confirmation.impact }}</p>
+                                    <div class="ba-confirm__meta">
+                                        <span>10 分钟内有效</span>
+                                        <span>身份已绑定</span>
+                                        <span>执行结果可追溯</span>
+                                    </div>
+                                    <button v-if="message.confirmationStatus !== 'done'" type="button"
+                                        :disabled="message.confirming" @click="confirmAction(message)">
+                                        {{ message.confirming ? '正在安全执行…' : '确认并执行' }} <i>→</i>
+                                    </button>
+                                    <div v-else class="ba-confirm__success"><i>✓</i> 操作已确认，商城数据已同步</div>
+                                </div>
+
+                                <div v-if="message.response && message.response.traceId" class="ba-trace">
+                                    TRACE · {{ shortTrace(message.response.traceId) }}
+                                </div>
+                            </div>
+                        </template>
+                    </article>
+
+                    <article v-if="loading" class="ba-message ba-message--assistant">
+                        <span class="ba-mini-avatar" aria-hidden="true">跃</span>
+                        <div class="ba-thinking"><i></i><i></i><i></i><em>大模型正在分析并汇总实时经营数据</em></div>
+                    </article>
+                </div>
+
+                <div class="ba-suggestions" aria-label="推荐问题">
+                    <button v-for="suggestion in suggestions" :key="suggestion" type="button"
+                        :disabled="loading" @click="useSuggestion(suggestion)">{{ suggestion }}</button>
+                </div>
+
+                <form class="ba-composer" @submit.prevent="sendMessage">
+                    <label for="adminAgentInput">向经营助手提问</label>
+                    <div class="ba-composer__row">
+                        <textarea id="adminAgentInput" ref="input" v-model="draft" rows="1" maxlength="300"
+                            placeholder="例如：给我一份经营概览" :disabled="loading"
+                            @keydown="handleKeydown"></textarea>
+                        <button type="submit" :disabled="loading || !draft.trim()">
+                            发送 <i>↑</i>
+                        </button>
+                    </div>
+                    <p>回答来自商城实时数据 · 高风险写操作必须管理员确认</p>
+                </form>
+            </div>
+
+            <aside class="ba-side">
+                <section class="ba-side-card">
+                    <span class="ba-side-card__kicker">WHAT I CAN DO</span>
+                    <h2>从数据到动作，<br>每一步都有依据。</h2>
+                    <div class="ba-capabilities">
+                        <div><b>01</b><span><strong>经营概览</strong><small>商品、会员、订单与成交金额</small></span></div>
+                        <div><b>02</b><span><strong>库存预警</strong><small>按阈值查找需要补货的装备</small></span></div>
+                        <div><b>03</b><span><strong>销量排行</strong><small>定位高销量与高成交商品</small></span></div>
+                        <div><b>04</b><span><strong>安全发货</strong><small>草案确认后更新待发货订单</small></span></div>
+                    </div>
+                </section>
+
+                <section class="ba-side-card ba-side-card--dark">
+                    <span class="ba-side-card__kicker">SAFETY GATE</span>
+                    <h2>写操作，<br>永远多一道确认。</h2>
+                    <p>确认令牌与管理员身份绑定，10 分钟内有效且只能成功领取一次。重复确认不会重复发货。</p>
+                    <div class="ba-side-trace">
+                        <span><i></i>身份隔离</span>
+                        <span><i></i>工具审计</span>
+                        <span><i></i>幂等执行</span>
+                    </div>
+                </section>
+
+                <a class="ba-back" href="/admin/right.html">← 返回管理工作台</a>
+            </aside>
+        </section>
+    </main>
+
+    <style>
+        body.console-workbench .ba-page {
+            box-sizing: border-box;
+            margin: 0 auto;
+            max-width: 1320px;
+            padding: 24px;
+            width: 100%;
+        }
+
+        .ba-page,
+        .ba-page * {
+            box-sizing: border-box;
+        }
+
+        .ba-hero {
+            background:
+                radial-gradient(circle at 79% 18%, rgba(201, 242, 93, 0.2), transparent 24%),
+                linear-gradient(118deg, #111827, #1c2b42);
+            border-radius: 26px;
+            color: #fff;
+            display: grid;
+            grid-template-columns: minmax(0, 1.08fr) minmax(300px, 0.92fr);
+            min-height: 292px;
+            overflow: hidden;
+            padding: 32px 38px;
+            position: relative;
+        }
+
+        .ba-hero::before {
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 38px 38px;
+            content: "";
+            inset: 0;
+            mask-image: linear-gradient(90deg, transparent 20%, #000);
+            position: absolute;
+        }
+
+        .ba-hero__copy,
+        .ba-hero__art {
+            position: relative;
+            z-index: 2;
+        }
+
+        .ba-kicker {
+            align-items: center;
+            color: var(--console-lime) !important;
+            display: flex;
+            font-size: 9px;
+            font-weight: 800;
+            gap: 8px;
+            letter-spacing: 0.18em;
+        }
+
+        .ba-kicker i {
+            background: var(--console-lime);
+            border-radius: 50%;
+            box-shadow: 0 0 0 5px rgba(201, 242, 93, 0.12);
+            height: 6px;
+            width: 6px;
+        }
+
+        .ba-hero h1 {
+            color: #fff !important;
+            font-size: clamp(31px, 4vw, 48px);
+            font-weight: 900;
+            letter-spacing: -0.065em;
+            line-height: 1.08;
+            margin: 19px 0 13px;
+        }
+
+        .ba-hero h1 em {
+            color: var(--console-lime) !important;
+            font-style: normal;
+        }
+
+        .ba-hero p {
+            color: rgba(255, 255, 255, 0.52) !important;
+            font-size: 11px;
+            line-height: 1.85;
+            margin: 0;
+            max-width: 490px;
+        }
+
+        .ba-hero__actions {
+            display: flex;
+            gap: 9px;
+            margin-top: 22px;
+        }
+
+        .ba-page .ba-hero__actions button {
+            align-items: center;
+            background: var(--console-lime);
+            border: 1px solid var(--console-lime);
+            border-radius: 99px;
+            color: var(--console-ink) !important;
+            display: inline-flex;
+            font-size: 10px;
+            font-weight: 800;
+            gap: 7px;
+            height: 36px;
+            padding: 0 15px;
+        }
+
+        .ba-page .ba-hero__actions button:hover {
+            background: #dbff7d;
+            border-color: #dbff7d;
+            transform: translateY(-1px);
+        }
+
+        .ba-page .ba-hero__actions button.is-ghost {
+            background: transparent;
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.76) !important;
+        }
+
+        .ba-hero__art {
+            min-height: 225px;
+        }
+
+        .ba-court {
+            border: 1px solid rgba(255, 255, 255, 0.13);
+            border-radius: 150px 150px 20px 20px;
+            inset: 0 20px 0 30px;
+            position: absolute;
+        }
+
+        .ba-court::before {
+            border: 1px solid rgba(255, 255, 255, 0.11);
+            border-radius: 50%;
+            content: "";
+            height: 80px;
+            left: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+        }
+
+        .ba-court::after {
+            border-left: 1px solid rgba(255, 255, 255, 0.11);
+            content: "";
+            inset: 0 auto 0 50%;
+            position: absolute;
+        }
+
+        .ba-orbit {
+            animation: baOrbit 9s linear infinite;
+            border: 1px dashed rgba(201, 242, 93, 0.3);
+            border-radius: 50%;
+            height: 170px;
+            left: 50%;
+            position: absolute;
+            top: 27px;
+            transform: translateX(-50%);
+            width: 170px;
+        }
+
+        .ba-ball {
+            animation: baFloat 4.6s ease-in-out infinite;
+            background: var(--console-lime);
+            border: 2px solid rgba(17, 24, 39, 0.75);
+            border-radius: 50%;
+            box-shadow: 0 28px 54px rgba(0, 0, 0, 0.32);
+            height: 96px;
+            left: 50%;
+            position: absolute;
+            top: 65px;
+            transform: translateX(-50%) rotate(-12deg);
+            width: 96px;
+            z-index: 3;
+        }
+
+        .ba-ball::before,
+        .ba-ball::after {
+            border: 1.5px solid rgba(17, 24, 39, 0.65);
+            border-radius: 50%;
+            content: "";
+            inset: 10px;
+            position: absolute;
+        }
+
+        .ba-ball::after {
+            border-color: transparent rgba(17, 24, 39, 0.65);
+            border-radius: 0;
+            inset: 4px 45px;
+        }
+
+        .ba-ball i {
+            background: var(--console-orange);
+            border: 2px solid var(--console-ink);
+            border-radius: 50%;
+            height: 13px;
+            position: absolute;
+            right: 4px;
+            top: 5px;
+            width: 13px;
+        }
+
+        .ba-float {
+            background: rgba(255, 255, 255, 0.94);
+            border-radius: 10px;
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.22);
+            color: var(--console-ink) !important;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            padding: 8px 10px;
+            position: absolute;
+            z-index: 4;
+        }
+
+        .ba-float--a {
+            left: 5px;
+            top: 24px;
+            transform: rotate(-4deg);
+        }
+
+        .ba-float--b {
+            bottom: 22px;
+            right: 3px;
+            transform: rotate(3deg);
+        }
+
+        .ba-access {
+            align-items: center;
+            background: #fff8f3;
+            border: 1px solid rgba(255, 107, 61, 0.22);
+            border-radius: 16px;
+            display: flex;
+            gap: 12px;
+            margin-top: 16px;
+            padding: 14px 17px;
+        }
+
+        .ba-access__icon {
+            align-items: center;
+            background: var(--console-orange);
+            border-radius: 9px;
+            color: #fff !important;
+            display: flex;
+            flex: 0 0 auto;
+            font-weight: 900;
+            height: 30px;
+            justify-content: center;
+            width: 30px;
+        }
+
+        .ba-access > span:nth-child(2) {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .ba-access strong {
+            color: var(--console-ink) !important;
+            font-size: 11px;
+        }
+
+        .ba-access small {
+            color: #8f7267 !important;
+            font-size: 9px;
+        }
+
+        .ba-access a {
+            color: #c14c2c !important;
+            font-size: 9px;
+            font-weight: 800;
+            margin-left: auto;
+        }
+
+        .ba-layout {
+            align-items: start;
+            display: grid;
+            gap: 16px;
+            grid-template-columns: minmax(0, 1.55fr) minmax(280px, 0.45fr);
+            margin-top: 17px;
+        }
+
+        .ba-console {
+            background: #fff;
+            border: 1px solid var(--console-line);
+            border-radius: 23px;
+            box-shadow: 0 18px 48px rgba(17, 24, 39, 0.08);
+            overflow: hidden;
+        }
+
+        .ba-console__head {
+            align-items: center;
+            background:
+                radial-gradient(circle at 88% 0, rgba(201, 242, 93, 0.13), transparent 32%),
+                var(--console-ink);
+            display: flex;
+            gap: 12px;
+            min-height: 82px;
+            padding: 14px 60px 14px 18px;
+            position: relative;
+        }
+
+        .ba-console__head::after {
+            background:
+                linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+                linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+            background-size: 25px 25px;
+            content: "";
+            inset: 0;
+            mask-image: linear-gradient(90deg, transparent 20%, #000);
+            pointer-events: none;
+            position: absolute;
+        }
+
+        .ba-console__avatar {
+            align-items: center;
+            background: var(--console-lime);
+            border-radius: 13px;
+            color: var(--console-ink) !important;
+            display: flex;
+            flex: 0 0 auto;
+            font-size: 15px;
+            font-weight: 900;
+            height: 44px;
+            justify-content: center;
+            position: relative;
+            transform: rotate(-3deg);
+            width: 44px;
+            z-index: 1;
+        }
+
+        .ba-console__avatar::after {
+            border: 1.5px solid rgba(17, 24, 39, 0.55);
+            border-radius: 50%;
+            content: "";
+            inset: 8px;
+            position: absolute;
+        }
+
+        .ba-console__identity {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            z-index: 1;
+        }
+
+        .ba-console__identity small {
+            color: var(--console-lime) !important;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+            margin-bottom: 4px;
+        }
+
+        .ba-console__identity strong {
+            color: #fff !important;
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .ba-console__identity em {
+            align-items: center;
+            color: rgba(255, 255, 255, 0.42) !important;
+            display: flex;
+            font-size: 8px;
+            font-style: normal;
+            gap: 5px;
+            margin-top: 5px;
+        }
+
+        .ba-console__identity em i {
+            background: #73df7b;
+            border-radius: 50%;
+            height: 5px;
+            width: 5px;
+        }
+
+        .ba-page .ba-console__reset {
+            align-items: center;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.11);
+            border-radius: 50%;
+            color: rgba(255, 255, 255, 0.7) !important;
+            display: flex;
+            font-size: 16px;
+            height: 31px;
+            justify-content: center;
+            padding: 0;
+            position: absolute;
+            right: 17px;
+            top: 16px;
+            width: 31px;
+            z-index: 2;
+        }
+
+        .ba-messages {
+            background:
+                radial-gradient(circle at 4% 0, rgba(201, 242, 93, 0.1), transparent 18%),
+                #f7f8f2;
+            height: clamp(330px, 47vh, 510px);
+            overflow-y: auto;
+            padding: 18px;
+            scrollbar-color: #c6ccbf transparent;
+            scrollbar-width: thin;
+        }
+
+        .ba-message {
+            margin-bottom: 15px;
+        }
+
+        .ba-message--user {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .ba-user-bubble {
+            background: var(--console-ink);
+            border-radius: 15px 15px 4px 15px;
+            color: #fff !important;
+            font-size: 11px;
+            line-height: 1.65;
+            max-width: 76%;
+            padding: 10px 13px;
+        }
+
+        .ba-message--assistant {
+            align-items: flex-start;
+            display: flex;
+            gap: 8px;
+        }
+
+        .ba-mini-avatar {
+            align-items: center;
+            background: var(--console-lime);
+            border: 1px solid rgba(17, 24, 39, 0.15);
+            border-radius: 50%;
+            color: var(--console-ink) !important;
+            display: flex;
+            flex: 0 0 auto;
+            font-size: 9px;
+            font-weight: 900;
+            height: 27px;
+            justify-content: center;
+            margin-top: 2px;
+            width: 27px;
+        }
+
+        .ba-answer,
+        .ba-thinking {
+            background: #fff;
+            border: 1px solid rgba(17, 24, 39, 0.075);
+            border-radius: 5px 15px 15px 15px;
+            box-shadow: 0 9px 26px rgba(17, 24, 39, 0.045);
+            min-width: 0;
+            padding: 12px 13px;
+            width: calc(100% - 35px);
+        }
+
+        .ba-answer.is-error {
+            background: #fff8f4;
+            border-color: rgba(255, 107, 61, 0.16);
+        }
+
+        .ba-answer > p {
+            color: #343d49 !important;
+            font-size: 11px;
+            line-height: 1.75;
+            margin: 0;
+            white-space: pre-line;
+        }
+
+        .ba-answer.is-error > p {
+            color: #a65339 !important;
+        }
+
+        .ba-steps {
+            border-top: 1px dashed rgba(17, 24, 39, 0.09);
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 12px;
+            margin-top: 10px;
+            padding-top: 9px;
+        }
+
+        .ba-steps span {
+            align-items: center;
+            color: #8c95a0 !important;
+            display: flex;
+            font-size: 8px;
+            gap: 5px;
+        }
+
+        .ba-steps i {
+            background: var(--console-lime-deep);
+            border-radius: 50%;
+            height: 5px;
+            width: 5px;
+        }
+
+        .ba-metrics {
+            display: grid;
+            gap: 7px;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            margin-top: 11px;
+        }
+
+        .ba-metric {
+            background:
+                linear-gradient(135deg, rgba(201, 242, 93, 0.11), transparent),
+                #f7f8f3;
+            border: 1px solid rgba(17, 24, 39, 0.055);
+            border-radius: 10px;
+            padding: 9px 10px;
+        }
+
+        .ba-metric small {
+            color: #9098a2 !important;
+            display: block;
+            font-size: 7px;
+            margin-bottom: 4px;
+        }
+
+        .ba-metric strong {
+            color: var(--console-ink) !important;
+            font-size: 15px;
+            font-weight: 900;
+            letter-spacing: -0.04em;
+        }
+
+        .ba-records {
+            display: grid;
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .ba-record {
+            align-items: center;
+            background: #f7f8f3;
+            border: 1px solid rgba(17, 24, 39, 0.045);
+            border-radius: 10px;
+            display: flex;
+            gap: 9px;
+            padding: 8px 9px;
+        }
+
+        .ba-record__index {
+            align-items: center;
+            background: var(--console-ink);
+            border-radius: 7px;
+            color: var(--console-lime) !important;
+            display: flex;
+            flex: 0 0 auto;
+            font-size: 7px;
+            font-weight: 800;
+            height: 26px;
+            justify-content: center;
+            width: 26px;
+        }
+
+        .ba-record__copy {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        .ba-record__copy small {
+            color: #9aa1aa !important;
+            font-size: 7px;
+            margin-bottom: 2px;
+        }
+
+        .ba-record__copy strong {
+            color: #3a4350 !important;
+            font-size: 9px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .ba-record__meta {
+            align-items: flex-end;
+            display: flex;
+            flex: 0 0 auto;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ba-record__meta b {
+            color: var(--console-orange) !important;
+            font-size: 9px;
+        }
+
+        .ba-record__meta em {
+            background: #e9f6c6;
+            border-radius: 99px;
+            color: #5c6900 !important;
+            font-size: 7px;
+            font-style: normal;
+            padding: 2px 6px;
+        }
+
+        .ba-confirm {
+            background:
+                radial-gradient(circle at 100% 0, rgba(201, 242, 93, 0.15), transparent 35%),
+                var(--console-ink);
+            border-radius: 13px;
+            margin-top: 11px;
+            overflow: hidden;
+            padding: 12px;
+            position: relative;
+        }
+
+        .ba-confirm.is-done {
+            opacity: 0.76;
+        }
+
+        .ba-confirm__top {
+            align-items: center;
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .ba-confirm__top span {
+            color: var(--console-lime) !important;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+        }
+
+        .ba-confirm__top i {
+            background: rgba(255, 107, 61, 0.13);
+            border: 1px solid rgba(255, 107, 61, 0.26);
+            border-radius: 99px;
+            color: #ff9d80 !important;
+            font-size: 6px;
+            font-style: normal;
+            padding: 3px 6px;
+        }
+
+        .ba-confirm > strong {
+            color: #fff !important;
+            display: block;
+            font-size: 11px;
+            margin-bottom: 5px;
+        }
+
+        .ba-confirm > p {
+            color: rgba(255, 255, 255, 0.55) !important;
+            font-size: 8px;
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        .ba-confirm__meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+            margin-top: 9px;
+        }
+
+        .ba-confirm__meta span {
+            color: rgba(255, 255, 255, 0.38) !important;
+            font-size: 6px;
+        }
+
+        .ba-confirm__meta span::before {
+            color: var(--console-lime);
+            content: "· ";
+        }
+
+        .ba-page .ba-confirm > button {
+            align-items: center;
+            background: var(--console-lime);
+            border: 0;
+            border-radius: 8px;
+            color: var(--console-ink) !important;
+            display: flex;
+            font-size: 9px;
+            font-weight: 800;
+            height: 32px;
+            justify-content: space-between;
+            margin-top: 11px;
+            padding: 0 11px;
+            width: 100%;
+        }
+
+        .ba-page .ba-confirm > button:disabled {
+            cursor: wait;
+            opacity: 0.65;
+        }
+
+        .ba-confirm__success {
+            align-items: center;
+            background: rgba(201, 242, 93, 0.1);
+            border-radius: 8px;
+            color: var(--console-lime) !important;
+            display: flex;
+            font-size: 8px;
+            gap: 6px;
+            margin-top: 10px;
+            padding: 8px;
+        }
+
+        .ba-trace {
+            color: #abb2ba !important;
+            font-size: 6px;
+            letter-spacing: 0.1em;
+            margin-top: 8px;
+            text-align: right;
+        }
+
+        .ba-thinking {
+            align-items: center;
+            display: flex;
+            gap: 4px;
+        }
+
+        .ba-thinking i {
+            animation: baBounce 1.2s ease-in-out infinite;
+            background: var(--console-lime-deep);
+            border-radius: 50%;
+            height: 5px;
+            width: 5px;
+        }
+
+        .ba-thinking i:nth-child(2) {
+            animation-delay: 0.12s;
+        }
+
+        .ba-thinking i:nth-child(3) {
+            animation-delay: 0.24s;
+        }
+
+        .ba-thinking em {
+            color: #9098a2 !important;
+            font-size: 8px;
+            font-style: normal;
+            margin-left: 4px;
+        }
+
+        .ba-suggestions {
+            background: #fff;
+            border-top: 1px solid rgba(17, 24, 39, 0.07);
+            display: flex;
+            gap: 6px;
+            overflow-x: auto;
+            padding: 10px 14px;
+            scrollbar-width: none;
+        }
+
+        .ba-suggestions::-webkit-scrollbar {
+            display: none;
+        }
+
+        .ba-page .ba-suggestions button {
+            background: #f3f5ec;
+            border: 1px solid rgba(17, 24, 39, 0.06);
+            border-radius: 99px;
+            color: #606a76 !important;
+            flex: 0 0 auto;
+            font-size: 8px;
+            height: 28px;
+            padding: 0 10px;
+        }
+
+        .ba-page .ba-suggestions button:hover {
+            background: #ebf8c9;
+            border-color: rgba(169, 220, 47, 0.55);
+            color: var(--console-ink) !important;
+        }
+
+        .ba-composer {
+            background: #fff;
+            border-top: 1px solid rgba(17, 24, 39, 0.08);
+            padding: 12px 14px 10px;
+        }
+
+        .ba-composer > label {
+            color: #8e96a0 !important;
+            display: block;
+            font-size: 7px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            margin-bottom: 6px;
+        }
+
+        .ba-composer__row {
+            align-items: flex-end;
+            background: #f4f6ef;
+            border: 1px solid transparent;
+            border-radius: 13px;
+            display: flex;
+            gap: 7px;
+            padding: 7px 7px 7px 11px;
+            transition: 0.2s ease;
+        }
+
+        .ba-composer__row:focus-within {
+            background: #fff;
+            border-color: rgba(169, 220, 47, 0.8);
+            box-shadow: 0 0 0 3px rgba(201, 242, 93, 0.18);
+        }
+
+        .ba-composer textarea {
+            background: transparent;
+            border: 0;
+            color: var(--console-ink) !important;
+            flex: 1;
+            font-size: 10px;
+            line-height: 1.5;
+            max-height: 82px;
+            min-height: 24px;
+            outline: 0;
+            padding: 4px 0;
+            resize: none;
+            width: 100%;
+        }
+
+        .ba-page .ba-composer__row button {
+            align-items: center;
+            background: var(--console-ink);
+            border: 0;
+            border-radius: 9px;
+            color: #fff !important;
+            display: flex;
+            flex: 0 0 auto;
+            font-size: 8px;
+            font-weight: 800;
+            gap: 6px;
+            height: 31px;
+            padding: 0 9px 0 11px;
+        }
+
+        .ba-composer__row button i {
+            align-items: center;
+            background: var(--console-lime);
+            border-radius: 5px;
+            color: var(--console-ink) !important;
+            display: flex;
+            font-size: 11px;
+            font-style: normal;
+            height: 18px;
+            justify-content: center;
+            width: 18px;
+        }
+
+        .ba-page .ba-composer__row button:disabled {
+            cursor: not-allowed;
+            opacity: 0.42;
+        }
+
+        .ba-composer > p {
+            color: #b2b8bf !important;
+            font-size: 6px;
+            margin: 7px 1px 0;
+            text-align: center;
+        }
+
+        .ba-side {
+            display: grid;
+            gap: 13px;
+        }
+
+        .ba-side-card {
+            background: #fff;
+            border: 1px solid var(--console-line);
+            border-radius: 20px;
+            overflow: hidden;
+            padding: 20px;
+            position: relative;
+        }
+
+        .ba-side-card::after {
+            border: 1px solid rgba(17, 24, 39, 0.05);
+            border-radius: 50%;
+            content: "";
+            height: 110px;
+            position: absolute;
+            right: -52px;
+            top: -60px;
+            width: 110px;
+        }
+
+        .ba-side-card__kicker {
+            color: #7d8c00 !important;
+            font-size: 7px;
+            font-weight: 800;
+            letter-spacing: 0.16em;
+        }
+
+        .ba-side-card h2 {
+            color: var(--console-ink) !important;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: -0.045em;
+            line-height: 1.25;
+            margin: 10px 0 18px;
+        }
+
+        .ba-capabilities {
+            display: grid;
+            gap: 4px;
+        }
+
+        .ba-capabilities > div {
+            align-items: center;
+            border-top: 1px solid #eff1e9;
+            display: flex;
+            gap: 11px;
+            padding: 10px 0;
+        }
+
+        .ba-capabilities b {
+            color: var(--console-orange) !important;
+            font-size: 7px;
+            width: 16px;
+        }
+
+        .ba-capabilities span {
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+        }
+
+        .ba-capabilities strong {
+            color: #3a4350 !important;
+            font-size: 10px;
+        }
+
+        .ba-capabilities small {
+            color: #949ca6 !important;
+            font-size: 8px;
+        }
+
+        .ba-side-card--dark {
+            background:
+                radial-gradient(circle at 100% 0, rgba(201, 242, 93, 0.16), transparent 32%),
+                var(--console-ink);
+        }
+
+        .ba-side-card--dark .ba-side-card__kicker {
+            color: var(--console-lime) !important;
+        }
+
+        .ba-side-card--dark h2 {
+            color: #fff !important;
+        }
+
+        .ba-side-card--dark p {
+            color: rgba(255, 255, 255, 0.48) !important;
+            font-size: 9px;
+            line-height: 1.8;
+            margin: 0;
+        }
+
+        .ba-side-trace {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 17px;
+        }
+
+        .ba-side-trace span {
+            align-items: center;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 99px;
+            color: rgba(255, 255, 255, 0.54) !important;
+            display: flex;
+            font-size: 7px;
+            gap: 5px;
+            padding: 5px 8px;
+        }
+
+        .ba-side-trace i {
+            background: var(--console-lime);
+            border-radius: 50%;
+            height: 4px;
+            width: 4px;
+        }
+
+        .ba-back {
+            color: #7d8591 !important;
+            font-size: 9px;
+            font-weight: 700;
+            padding: 6px 3px;
+        }
+
+        .ba-back:hover {
+            color: var(--console-orange) !important;
+        }
+
+        @keyframes baFloat {
+            0%,
+            100% {
+                transform: translateX(-50%) translateY(0) rotate(-12deg);
+            }
+            50% {
+                transform: translateX(-50%) translateY(-12px) rotate(3deg);
+            }
+        }
+
+        @keyframes baOrbit {
+            to {
+                transform: translateX(-50%) rotate(360deg);
+            }
+        }
+
+        @keyframes baBounce {
+            0%,
+            60%,
+            100% {
+                opacity: 0.35;
+                transform: translateY(0);
+            }
+            30% {
+                opacity: 1;
+                transform: translateY(-4px);
+            }
+        }
+
+        @media (max-width: 1050px) {
+            .ba-layout {
+                grid-template-columns: 1fr;
+            }
+
+            .ba-side {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .ba-back {
+                grid-column: 1 / -1;
+            }
+        }
+
+        @media (max-width: 760px) {
+            body.console-workbench .ba-page {
+                padding: 12px;
+            }
+
+            .ba-hero {
+                border-radius: 20px;
+                grid-template-columns: 1fr;
+                min-height: auto;
+                padding: 26px 22px;
+            }
+
+            .ba-hero__art {
+                display: none;
+            }
+
+            .ba-side {
+                grid-template-columns: 1fr;
+            }
+
+            .ba-access {
+                align-items: flex-start;
+                flex-wrap: wrap;
+            }
+
+            .ba-access a {
+                margin-left: 42px;
+            }
+
+            .ba-metrics {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            .ba-ball,
+            .ba-orbit,
+            .ba-thinking i {
+                animation: none;
+            }
+
+            .ba-page *,
+            .ba-page *::before,
+            .ba-page *::after {
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+
+    <script>
+        new Vue({
+            el: '#adminAgentApp',
+            data: function () {
+                return {
+                    messages: [{
+                        id: 0,
+                        role: 'assistant',
+                        text: '经营助手已就绪。我可以汇总商城经营数据、查找低库存商品、查看销量排行，也可以为待发货订单生成安全发货草案。先问我一句“给我一份经营概览”吧。',
+                        response: null
+                    }],
+                    draft: '',
+                    loading: false,
+                    accessError: '',
+                    toolCount: 4,
+                    messageSeed: 1,
+                    sessionId: '',
+                    suggestions: ['给我一份经营概览', '库存低于95的商品', '销量最好的商品', '把订单32发货']
+                };
+            },
+            methods: {
+                loadTools: function () {
+                    axios.get('/agent/tools', { params: { mode: 'admin' } }).then(function (result) {
+                        var body = result.data || {};
+                        if (body.state === 66 && Array.isArray(body.data)) {
+                            this.toolCount = body.data.length;
+                            this.accessError = '';
+                        } else {
+                            this.accessError = body.message || '管理员身份校验未通过';
+                        }
+                    }.bind(this)).catch(function () {
+                        this.accessError = '暂时无法连接经营助手，请重新登录管理员后台后再试';
+                    }.bind(this));
+                },
+                useSuggestion: function (text) {
+                    this.draft = text;
+                    this.sendMessage();
+                },
+                handleKeydown: function (event) {
+                    if (event.key === 'Enter' && !event.shiftKey && !event.isComposing) {
+                        event.preventDefault();
+                        this.sendMessage();
+                    }
+                },
+                sendMessage: function () {
+                    var text = this.draft.trim();
+                    if (!text || this.loading) {
+                        return;
+                    }
+                    var history = this.getConversationHistory();
+                    this.messages.push({
+                        id: ++this.messageSeed,
+                        role: 'user',
+                        text: text
+                    });
+                    this.draft = '';
+                    this.loading = true;
+                    this.scrollToBottom();
+
+                    axios.post('/agent/chat', {
+                        message: text,
+                        mode: 'admin',
+                        sessionId: this.getSessionId(),
+                        history: history
+                    }).then(function (result) {
+                        var body = result.data || {};
+                        if (body.state !== 66) {
+                            this.pushAssistant(body.message || '经营助手暂时没有响应', null, true);
+                            if (body.state === 403) {
+                                this.accessError = body.message || '管理员身份校验未通过';
+                            }
+                            return;
+                        }
+                        var data = body.data || {};
+                        if (data.sessionId) {
+                            this.sessionId = data.sessionId;
+                            sessionStorage.setItem('yd_admin_agent_session', data.sessionId);
+                        }
+                        this.messages.push({
+                            id: ++this.messageSeed,
+                            role: 'assistant',
+                            text: data.answer || '本次操作已完成。',
+                            response: data,
+                            confirming: false,
+                            confirmationStatus: ''
+                        });
+                        this.suggestions = Array.isArray(data.suggestions) && data.suggestions.length
+                            ? data.suggestions : [];
+                    }.bind(this)).catch(function () {
+                        this.pushAssistant('网络连接不稳定，请稍后重试；商城原有管理功能不受影响。', null, true);
+                    }.bind(this)).finally(function () {
+                        this.loading = false;
+                        this.scrollToBottom();
+                    }.bind(this));
+                },
+                confirmAction: function (message) {
+                    if (!message.response || !message.response.confirmation || message.confirming) {
+                        return;
+                    }
+                    message.confirming = true;
+                    axios.post('/agent/confirm', {
+                        token: message.response.confirmation.token,
+                        mode: 'admin'
+                    }).then(function (result) {
+                        var body = result.data || {};
+                        if (body.state !== 66) {
+                            this.pushAssistant(body.message || '确认执行失败，请重新发起操作。', null, true);
+                            message.confirmationStatus = 'failed';
+                            return;
+                        }
+                        var data = body.data || {};
+                        message.confirmationStatus = 'done';
+                        this.messages.push({
+                            id: ++this.messageSeed,
+                            role: 'assistant',
+                            text: data.answer || '操作已执行。',
+                            response: data
+                        });
+                    }.bind(this)).catch(function () {
+                        this.pushAssistant('确认执行失败，请检查网络后重试。', null, true);
+                        message.confirmationStatus = 'failed';
+                    }.bind(this)).finally(function () {
+                        message.confirming = false;
+                        this.scrollToBottom();
+                    }.bind(this));
+                },
+                resetChat: function () {
+                    this.messages = [{
+                        id: ++this.messageSeed,
+                        role: 'assistant',
+                        text: '对话已清空。你可以继续查询经营数据，或为待发货订单生成确认草案。',
+                        response: null
+                    }];
+                    this.draft = '';
+                    this.suggestions = ['给我一份经营概览', '库存低于95的商品', '销量最好的商品', '把订单32发货'];
+                    if (this.$refs.input) {
+                        this.$refs.input.focus();
+                    }
+                },
+                pushAssistant: function (text, response, isError) {
+                    this.messages.push({
+                        id: ++this.messageSeed,
+                        role: 'assistant',
+                        text: text,
+                        response: response,
+                        isError: !!isError
+                    });
+                    this.scrollToBottom();
+                },
+                getSessionId: function () {
+                    if (this.sessionId) {
+                        return this.sessionId;
+                    }
+                    var saved = sessionStorage.getItem('yd_admin_agent_session');
+                    if (saved) {
+                        this.sessionId = saved;
+                        return saved;
+                    }
+                    var random = Math.random().toString(36).slice(2, 12);
+                    this.sessionId = 'aag_' + Date.now().toString(36) + random;
+                    sessionStorage.setItem('yd_admin_agent_session', this.sessionId);
+                    return this.sessionId;
+                },
+                getConversationHistory: function () {
+                    return this.messages
+                        .filter(function (message) {
+                            return message.text
+                                && (message.role === 'user' || message.role === 'assistant');
+                        })
+                        .slice(-8)
+                        .map(function (message) {
+                            return {
+                                role: message.role,
+                                text: String(message.text).slice(0, 800)
+                            };
+                        });
+                },
+                metricEntries: function (message) {
+                    if (!message.response || !message.response.data) {
+                        return [];
+                    }
+                    var data = message.response.data;
+                    var entries = [];
+                    Object.keys(data).forEach(function (key) {
+                        var value = data[key];
+                        if (value === null || typeof value !== 'object') {
+                            entries.push({ key: key, value: value });
+                        }
+                    });
+                    return entries;
+                },
+                metricLabel: function (key) {
+                    var labels = {
+                        productCount: '在售商品',
+                        lowStockCount: '低库存商品',
+                        userCount: '校园会员',
+                        orderCount: '累计订单',
+                        pendingShipmentCount: '待发货',
+                        revenue: '累计成交'
+                    };
+                    return labels[key] || key;
+                },
+                metricValue: function (key, value) {
+                    if (key === 'revenue') {
+                        return '¥' + Number(value || 0).toLocaleString('zh-CN');
+                    }
+                    return Number(value || 0).toLocaleString('zh-CN');
+                },
+                riskText: function (level) {
+                    if (level === 'write_high') {
+                        return '高风险写操作';
+                    }
+                    return level === 'write_low' ? '写操作' : '只读';
+                },
+                shortTrace: function (traceId) {
+                    return traceId ? traceId.slice(-12).toUpperCase() : '';
+                },
+                scrollToBottom: function () {
+                    var self = this;
+                    this.$nextTick(function () {
+                        var box = self.$refs.messages;
+                        if (box) {
+                            box.scrollTop = box.scrollHeight;
+                        }
+                    });
+                }
+            },
+            created: function () {
+                this.sessionId = sessionStorage.getItem('yd_admin_agent_session') || '';
+                this.loadTools();
+            }
+        });
+    </script>
+</body>
+
+</html>

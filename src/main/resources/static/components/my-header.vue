@@ -85,6 +85,8 @@
     </div>
 </nav>
 <!-- 导航 -->
+
+<agent-console></agent-console>
 </div>
 </template>
 
@@ -93,6 +95,9 @@
 <script>
 
     module.exports = {
+        components: {
+            'agent-console': httpVueLoader('/components/agent-console.vue')
+        },
         data: function() {
             return {
                 isLogin: false,

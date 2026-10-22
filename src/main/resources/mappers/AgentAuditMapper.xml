@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.xiangmu.mappers.AgentAuditMapper">
+
+    <insert id="upsertSession" parameterType="com.xiangmu.agent.record.AgentSessionRecord">
+        insert into t_agent_session
+            (session_id, trace_id, mode, actor_type, actor_id, actor_name, created_at, last_active_at)
+        values
+            (#{sessionId}, #{traceId}, #{mode}, #{actorType}, #{actorId}, #{actorName}, now(), now())
+        on duplicate key update
+            trace_id = values(trace_id),
+            actor_type = values(actor_type),
+            actor_id = values(actor_id),
+            actor_name = values(actor_name),
+            last_active_at = now()
+    </insert>
+
+    <insert id="insertToolCall" parameterType="com.xiangmu.agent.record.AgentToolCallRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into t_agent_tool_call
+            (trace_id, session_id, actor_type, actor_id, actor_name,
+             tool_name, tool_version, risk_level, request_summary, response_summary,
+             status, latency_ms, confirmation_id, idempotency_key, created_at)
+        values
+            (#{traceId}, #{sessionId}, #{actorType}, #{actorId}, #{actorName},
+             #{toolName}, #{toolVersion}, #{riskLevel}, #{requestSummary}, #{responseSummary},
+             #{status}, #{latencyMs}, #{confirmationId}, #{idempotencyKey}, now())
+    </insert>
+
+    <resultMap id="toolCallMap" type="com.xiangmu.agent.record.AgentToolCallRecord">
+        <id property="id" column="id"/>
+        <result property="traceId" column="trace_id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="actorType" column="actor_type"/>
+        <result property="actorId" column="actor_id"/>
+        <result property="actorName" column="actor_name"/>
+        <result property="toolName" column="tool_name"/>
+        <result property="toolVersion" column="tool_version"/>
+        <result property="riskLevel" column="risk_level"/>
+        <result property="requestSummary" column="request_summary"/>
+        <result property="responseSummary" column="response_summary"/>
+        <result property="status" column="status"/>
+        <result property="latencyMs" column="latency_ms"/>
+        <result property="confirmationId" column="confirmation_id"/>
+        <result property="idempotencyKey" column="idempotency_key"/>
+    </resultMap>
+
+    <select id="findCallByKey" resultMap="toolCallMap">
+        select *
+        from t_agent_tool_call
+        where idempotency_key = #{idempotencyKey}
+        limit 1
+    </select>
+
+    <insert id="insertConfirmation" parameterType="com.xiangmu.agent.record.AgentConfirmationRecord"
+            useGeneratedKeys="true" keyProperty="id">
+        insert into t_agent_confirmation
+            (token, trace_id, session_id, actor_type, actor_id, actor_name,
+             tool_name, risk_level, arguments_json, title, impact, status,
+             idempotency_key, created_at, expires_at)
+        values
+            (#{token}, #{traceId}, #{sessionId}, #{actorType}, #{actorId}, #{actorName},
+             #{toolName}, #{riskLevel}, #{argumentsJson}, #{title}, #{impact}, #{status},
+             #{idempotencyKey}, now(), #{expiresAt})
+    </insert>
+
+    <resultMap id="confirmationMap" type="com.xiangmu.agent.record.AgentConfirmationRecord">
+        <id property="id" column="id"/>
+        <result property="token" column="token"/>
+        <result property="traceId" column="trace_id"/>
+        <result property="sessionId" column="session_id"/>
+        <result property="actorType" column="actor_type"/>
+        <result property="actorId" column="actor_id"/>
+        <result property="actorName" column="actor_name"/>
+        <result property="toolName" column="tool_name"/>
+        <result property="riskLevel" column="risk_level"/>
+        <result property="argumentsJson" column="arguments_json"/>
+        <result property="title" column="title"/>
+        <result property="impact" column="impact"/>
+        <result property="status" column="status"/>
+        <result property="idempotencyKey" column="idempotency_key"/>
+        <result property="createdAt" column="created_at"/>
+        <result property="expiresAt" column="expires_at"/>
+        <result property="executedAt" column="executed_at"/>
+        <result property="toolCallId" column="tool_call_id"/>
+        <result property="resultSummary" column="result_summary"/>
+    </resultMap>
+
+    <select id="findConfirmationByToken" resultMap="confirmationMap">
+        select *
+        from t_agent_confirmation
+        where token = #{token}
+        limit 1
+    </select>
+
+    <update id="claimConfirmation">
+        update t_agent_confirmation
+        set status = 'EXECUTING'
+        where token = #{token}
+          and actor_type = #{actorType}
+          and actor_id = #{actorId}
+          and status = 'PENDING'
+          and expires_at &gt; now()
+    </update>
+
+    <update id="finishConfirmation">
+        update t_agent_confirmation
+        set status = #{status},
+            tool_call_id = #{toolCallId},
+            result_summary = #{resultSummary},
+            executed_at = now()
+        where token = #{token}
+          and status = 'EXECUTING'
+    </update>
+
+</mapper>

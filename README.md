@@ -4,7 +4,7 @@
 
 ### 大学生体育用品商城
 
-面向高校学生的体育用品电商平台，包含前台商城、用户个人中心和管理员后台。项目采用校园运动视觉风格，注重商品展示、选品效率和移动端使用体验。
+面向高校学生的体育用品电商平台，包含前台商城、用户个人中心、管理员后台，以及接入 DeepSeek/OpenAI 兼容大模型的商城 Agent。项目采用校园运动视觉风格，注重商品展示、选品效率和移动端使用体验。
 
 [![Java](https://img.shields.io/badge/Java-8-orange)](https://www.oracle.com/java/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-2.6.11-6DB33F)](https://spring.io/projects/spring-boot)
@@ -20,6 +20,8 @@
 跃动 YueDong 是一个基于 Spring Boot 的大学生体育用品购物网站，围绕球类、训练服饰、运动配件等校园运动场景提供完整的购物流程。
 
 项目已完成前台、用户个人中心和管理员后台的校园运动风视觉统一，使用运动跑道、球场线条、醒目比分牌配色和轻量动效强化体育氛围，并针对桌面端和手机端做了响应式适配。
+
+商城 Agent 已从关键词规则助手升级为大模型规划器。模型负责理解自然语言、补全多轮上下文、选择已注册工具和组织回答，服务端负责身份校验、实时数据读取、写入确认与审计。没有配置模型或模型服务不可用时，系统会自动降级为规则助手，不影响原有购物和管理功能。
 
 > 这是一个适合课程设计、毕业设计学习和 Java Web 入门实践的全栈示例项目，不是可直接用于生产环境的商业系统。正式部署前请修改默认密码、加强认证授权并完善支付、日志与数据安全设计。
 
@@ -53,6 +55,17 @@
 - 商品评价管理
 - ECharts 销售数据可视化
 
+### 智能体 Agent
+
+- 前台体育用品导购，支持预算、运动类别、商品编号和自然语言组合条件
+- 支持“那 120 元以内呢”“换成羽毛球”等多轮上下文表达
+- 查询实时商品、价格、库存、本人订单和商品详情
+- 加购先生成确认草案，用户确认后才写入购物车
+- 管理员经营概览、低库存分析、销量排行和待发货订单草案
+- 发货等高风险操作必须二次确认，并支持幂等与审计记录
+- DeepSeek、OpenAI 兼容接口及本地 Ollama 均可接入
+- 模型未配置、超时或返回异常时自动降级到规则规划器
+
 ## 技术栈
 
 | 分类 | 技术 |
@@ -64,6 +77,9 @@
 | 前端框架 | Vue 2、Axios |
 | UI 与组件 | Element UI、Layui、Bootstrap、Bootstrap Icons |
 | 交互与可视化 | jQuery、ECharts、CKEditor |
+| 大模型 | DeepSeek Chat、OpenAI 兼容 Chat Completions |
+| Agent 能力 | Function Calling、JSON Schema 工具注册、多轮上下文 |
+| 安全与审计 | Session 身份校验、权限白名单、确认令牌、幂等、操作审计 |
 | 构建工具 | Maven |
 | 开发工具 | IntelliJ IDEA（推荐）或 Eclipse |
 
@@ -83,6 +99,7 @@ YueDong/
 │  │  │  ├─ mappers/               # MyBatis Mapper 接口
 │  │  │  ├─ pojo/                  # 实体类
 │  │  │  ├─ service/               # 业务服务
+│  │  │  ├─ agent/                 # 大模型规划器、工具、确认与审计
 │  │  │  └─ util/                  # 工具类
 │  │  └─ resources/
 │  │     ├─ application.properties # 端口和数据库配置
@@ -171,10 +188,67 @@ spring.datasource.password=123456
 mvn spring-boot:run
 ```
 
-### 6. 访问系统
+### 6. 配置商城 Agent 大模型
+
+Agent 配置位于 [`src/main/resources/application.properties`](src/main/resources/application.properties)，默认使用 DeepSeek：
+
+```properties
+agent.llm.enabled=true
+agent.llm.base-url=https://api.deepseek.com
+agent.llm.api-key=${DEEPSEEK_API_KEY:}
+agent.llm.model=deepseek-chat
+agent.llm.timeout-ms=12000
+agent.llm.max-tokens=700
+```
+
+API Key 不应写入 `application.properties`、JavaScript、README 或提交到 Git。先在系统中设置环境变量。
+
+Windows PowerShell：
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+  "DEEPSEEK_API_KEY",
+  "你的DeepSeek-API-Key",
+  "User"
+)
+```
+
+设置后请关闭并重新打开 IntelliJ IDEA，使新的环境变量生效。也可以在 PowerShell 中临时设置后启动：
+
+```powershell
+$env:DEEPSEEK_API_KEY="你的DeepSeek-API-Key"
+mvn spring-boot:run
+```
+
+使用 IntelliJ IDEA 时，也可以在 **Run → Edit Configurations → Runboot → Environment variables** 中添加 `DEEPSEEK_API_KEY`。
+
+如果没有 API Key，可以保持 `agent.llm.enabled=false`，系统会使用规则助手；也可以接入本地 Ollama：
+
+```properties
+agent.llm.enabled=true
+agent.llm.base-url=http://localhost:11434/v1
+agent.llm.api-key=
+agent.llm.model=qwen2.5:7b
+```
+
+Agent 响应中的 `planner` 字段可用于判断实际模式：
+
+```json
+{
+  "planner": "llm",
+  "provider": "DeepSeek",
+  "model": "deepseek-chat",
+  "answerPlanner": "llm"
+}
+```
+
+如果显示 `planner: "rules"`，说明当前使用的是本地规则降级模式，请检查 Key、网络、模型名称和启动环境变量。
+
+### 7. 访问系统
 
 - 前台商城：[http://localhost:8888](http://localhost:8888)
 - 管理员登录：[http://localhost:8888/login.html](http://localhost:8888/login.html)
+- 管理员经营助手：[http://localhost:8888/admin/agent/agent.html](http://localhost:8888/admin/agent/agent.html)
 
 演示账号：
 
@@ -196,6 +270,30 @@ mvn spring-boot:run
 | MySQL 地址 | `localhost:3306` | 按本机 MySQL 地址和端口修改 |
 | 上传大小限制 | `500MB` | 对应 Spring Multipart 配置 |
 | Mapper 位置 | `classpath:mappers/*.xml` | MyBatis SQL 映射目录 |
+| Agent 开关 | `agent.llm.enabled` | `true` 优先调用大模型，异常时自动降级 |
+| Agent 接口 | `agent.llm.base-url` | DeepSeek 或 OpenAI 兼容接口地址 |
+| Agent 模型 | `agent.llm.model` | 默认 `deepseek-chat` |
+| Agent Key | `DEEPSEEK_API_KEY` | 只从环境变量读取，禁止提交到仓库 |
+
+## Agent 调用链
+
+```text
+浏览器问题 + 最近对话
+        ↓
+Spring Boot /agent/chat
+        ↓
+DeepSeek 大模型理解需求并选择工具
+        ↓
+服务端校验 Session、角色、工具白名单和参数
+        ↓
+MyBatis 读取商品、订单、库存或经营数据
+        ↓
+大模型根据真实工具结果组织自然语言
+        ↓
+读操作直接返回；写操作返回确认草案，确认后才执行
+```
+
+模型只能从服务端注册的工具中选择能力，不能直接访问数据库，也不能绕过管理员权限。加购和发货工具即使被模型选中，也只会生成确认草案；最终业务结果始终以服务端数据库操作结果为准。
 
 图片、附件等上传文件会在项目运行时生成，并保存在运行目录的 `upload` 文件夹中。这些运行时文件默认不会提交到 Git。
 
